@@ -1,0 +1,75 @@
+{
+  "accessDate": "2026-10-08",
+  "localTime": {
+    "boundaryLibrary": "timezonefinder 8.2.2, full timezones-with-oceans dataset",
+    "boundarySource": "https://github.com/evansiroky/timezone-boundary-builder",
+    "rules": "IANA timezone database; browser Intl.DateTimeFormat for historical offsets and DST",
+    "positionMethod": "Nearest retained GPS fix; no location API requests.",
+    "flightDays": "Civil dates at each recorded fix; original UTC\u22127 curation windows retain the same observations."
+  },
+  "sources": [
+    {
+      "doi": "https://doi.org/10.5066/P9VUN0Q9",
+      "metadata": "https://www.sciencebase.gov/catalog/item/659d8f29d34e3265ab163230?format=json",
+      "file": "goose_migrationAltitude_nePacific_weiser.csv",
+      "sha256": "e36afb47893a046c49375c6872d9cd9841bcea9c801b37687b6ccaf109154e9b",
+      "selection": "used=1 only; two named bouts; model available-altitude rows excluded."
+    },
+    {
+      "doi": "https://doi.org/10.5066/F7F76BGR",
+      "metadata": "https://www.sciencebase.gov/catalog/item/59a472d7e4b077f005673486?format=json",
+      "file": "sacr_locations.csv",
+      "sha256": "26d97badd7b65be278611445013a8a96603bc54f366bc9c166ed8b0c7c0e7fa6",
+      "coordinateMethod": "Inverse of the exact published AEQD/GRS80 parameters. Geographic coordinates used for landscape viewing; no survey-grade datum transformation claimed."
+    }
+  ],
+  "tracks": [
+    {
+      "id": "white_fronted_goose_2021",
+      "species": "Greater white-fronted goose",
+      "individual": "gwf_171615.1",
+      "curation": "Published bout gwf_171615.1_113_10; used=1 observations only; available/model altitude bands excluded; duplicate timestamps removed; raw GPS altitudes outside \u2212100 to 6500 m excluded; daytime and nighttime fixes retained.",
+      "timeZones": [
+        "America/Los_Angeles",
+        "Etc/GMT+8",
+        "Etc/GMT+9",
+        "America/Yakutat"
+      ],
+      "medianIntervalSeconds": 900,
+      "maxInterpolationGapSeconds": 2700,
+      "altitudeDatum": "Original GPS altitude in metres, as supplied by the release. Camera height remains approximate; adjusted analysis altitudes are not substituted.",
+      "fixes": 267
+    },
+    {
+      "id": "snow_goose_2019",
+      "species": "Snow goose",
+      "individual": "lsn_180789.1",
+      "curation": "Published bout lsn_180789.1_71_7; used=1 observations only; available/model altitude bands excluded; duplicate timestamps removed; raw GPS altitudes outside \u2212100 to 6500 m excluded; daytime and nighttime fixes retained.",
+      "timeZones": [
+        "Etc/GMT+9",
+        "America/Sitka",
+        "America/Vancouver",
+        "America/Los_Angeles"
+      ],
+      "medianIntervalSeconds": 900,
+      "maxInterpolationGapSeconds": 2700,
+      "altitudeDatum": "Original GPS altitude in metres, as supplied by the release. Camera height remains approximate; adjusted analysis altitudes are not substituted.",
+      "fixes": 54
+    },
+    {
+      "id": "sandhill_crane_2013",
+      "species": "Sandhill crane",
+      "individual": "100845",
+      "curation": "Individual 100845, 74 unique timestamps from 75 released locations; one duplicate timestamp removed, sorted by UTC time. Published X/Y coordinates inverted from azimuthal equidistant (centre 51\u00b0 N, 110\u00b0 W; GRS80; kilometre units). No GPS altitude or instantaneous speed is supplied.",
+      "timeZones": [
+        "America/Anchorage",
+        "America/Swift_Current",
+        "America/Denver"
+      ],
+      "medianIntervalSeconds": 21600,
+      "maxInterpolationGapSeconds": 64800,
+      "altitudeDatum": "Altitude is not included in the release. The camera uses an illustrative height of 750 m above loaded terrain.",
+      "fixes": 74
+    }
+  ]
+}

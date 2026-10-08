@@ -1,0 +1,7 @@
+.sites-runtime/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+.openai/
+dist/

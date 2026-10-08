@@ -1,0 +1,49 @@
+{
+  "status": "local_app_verified_github_deployment_pending",
+  "checks": {
+    "flight_math_tests": 6,
+    "syntax": "passed",
+    "browser": [
+      "play/pause",
+      "first-person drag",
+      "follow camera",
+      "route overview",
+      "journey switch",
+      "flight-day selection",
+      "source dialog",
+      "mobile viewport",
+      "timeline first and last observations",
+      "mobile playback speed",
+      "mobile next-day control",
+      "local/UTC clock switch",
+      "Sinaloa 2021 DST and UTC date rollover",
+      "sunset terrain and sky transition",
+      "night terrain and sky transition",
+      "24-hour held-position light preview",
+      "preview animation and pause",
+      "mobile time and lighting controls"
+    ],
+    "webmcp": {
+      "valid_playback_input": "passed",
+      "invalid_day": "rejected_without_state_change",
+      "invalid_light_preview": "rejected_without_state_change"
+    },
+    "startup_loading": "passed",
+    "local_asset_delivery": "passed",
+    "time_and_light_tests": 6,
+    "total_tests": 17,
+    "local_time": "full geographic timezone boundaries and historical DST verified",
+    "sunlight": "flight timestamps drive Cesium sun, terrain and atmosphere; fade adjusted at flight height",
+    "gaps_and_catalog_tests": 5
+  },
+  "limitations": [
+    "Raw GPS height vertical datum unspecified; camera height approximate.",
+    "One-second eagle raw file unavailable; omitted.",
+    "Custom-licensed osprey data omitted pending owner permission.",
+    "Satellite and terrain imagery may vary in date, resolution and coverage.",
+    "Sunlight model omits weather, artificial lighting and bird visual sensitivity; 24h preview holds position.",
+    "Crane altitude not released; sparse fixes use illustrative viewing height. Goose and crane speeds are estimated segment means."
+  ],
+  "product_url_local": "http://127.0.0.1:4173/",
+  "publication": "GitHub Pages deployment prepared; live verification pending."
+}

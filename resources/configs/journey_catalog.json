@@ -1,0 +1,6 @@
+{
+  "datasets": [
+    "data/03_data_preparation/journeys.json",
+    "data/04_multi_species/journeys.json"
+  ]
+}

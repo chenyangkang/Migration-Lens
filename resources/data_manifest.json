@@ -1,0 +1,53 @@
+{
+  "sourceUrl": "https://datarepository.movebank.org/server/api/core/bitstreams/b5c678b9-dca2-4710-a41d-a6f76af96ba6/content",
+  "sourceDoi": "https://doi.org/10.5441/001/1.f3qt46r2",
+  "sourceSha256": "28bd484037b8fd83697d4b901ef361342891ffa05488fb6ba6aa2c6cf9020e0d",
+  "accessDate": "2026-10-08",
+  "sourceRows": 1772639,
+  "licenceNote": "Repository metadata states CC BY 4.0; bundled README states CC0. Migration Lens preserves full attribution and follows the more restrictive CC BY attribution condition.",
+  "tracks": [
+    {
+      "id": "peter_2021",
+      "individual": "Peter",
+      "medianIntervalSeconds": 60,
+      "totalDistanceKm": 2564.9,
+      "durationDays": 18.4,
+      "curation": "Visible Turkey Vulture GPS observations only; marked outliers removed; duplicate timestamps removed; numeric raw heights outside -100 to 6500 removed; UTC\u22127 selection windows trimmed to first and last fixes with ground speed \u22654 m/s; isolated inter-fix speeds >40 m/s removed.",
+      "fixes": 7794,
+      "days": 19,
+      "timeZones": [
+        "America/Phoenix",
+        "America/Hermosillo",
+        "America/Mazatlan"
+      ]
+    },
+    {
+      "id": "leo_2016",
+      "individual": "Leo",
+      "medianIntervalSeconds": 3600,
+      "totalDistanceKm": 5961.9,
+      "durationDays": 36.2,
+      "curation": "Visible Turkey Vulture GPS observations only; marked outliers removed; duplicate timestamps removed; numeric raw heights outside -100 to 6500 removed; UTC\u22127 selection windows trimmed to first and last fixes with ground speed \u22654 m/s; isolated inter-fix speeds >40 m/s removed.",
+      "fixes": 206,
+      "days": 30,
+      "timeZones": [
+        "America/Swift_Current",
+        "America/Regina",
+        "America/Chicago",
+        "America/Monterrey",
+        "America/Mexico_City",
+        "America/Guatemala",
+        "America/El_Salvador",
+        "America/Tegucigalpa",
+        "America/Managua"
+      ]
+    }
+  ],
+  "localTime": {
+    "boundaryLibrary": "timezonefinder 8.2.2, full timezones-with-oceans dataset",
+    "boundarySource": "https://github.com/evansiroky/timezone-boundary-builder",
+    "rules": "IANA timezone database; browser Intl.DateTimeFormat for historical offsets and DST",
+    "positionMethod": "Nearest retained GPS fix; no location API requests.",
+    "flightDays": "Civil dates at each recorded fix; original UTC\u22127 curation windows retain the same observations."
+  }
+}

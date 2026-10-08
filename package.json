@@ -1,0 +1,1 @@
+{"name":"migration-lens","version":"1.0.0","private":true,"type":"module","scripts":{"build":"node scripts/00_setup/build.mjs","test":"node --test scripts/07_tests/*.test.mjs"},"dependencies":{},"engines":{"node":">=20"}}
