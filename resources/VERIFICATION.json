@@ -21,7 +21,14 @@
       "night terrain and sky transition",
       "24-hour held-position light preview",
       "preview animation and pause",
-      "mobile time and lighting controls"
+      "mobile time and lighting controls",
+      "species filtering across four species",
+      "goose nighttime GPS observation",
+      "gap countdown and automatic continuation",
+      "pause before jump",
+      "explicit jump acknowledgement",
+      "crane ground route and illustrative first-person height",
+      "hatched timeline and dashed route gaps"
     ],
     "webmcp": {
       "valid_playback_input": "passed",
@@ -45,5 +52,5 @@
     "Crane altitude not released; sparse fixes use illustrative viewing height. Goose and crane speeds are estimated segment means."
   ],
   "product_url_local": "http://127.0.0.1:4173/",
-  "publication": "GitHub Pages deployment prepared; live verification pending."
+  "publication": "GitHub Pages enabled; production deployment verification pending."
 }

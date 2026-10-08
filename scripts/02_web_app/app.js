@@ -134,7 +134,7 @@ function chooseJourney(id){
   renderGapList();
   ui.journeySelect.value=id;ui.flightHeading.textContent=journey.subtitle;ui.flightLocation.textContent=`${journey.individual} · ${journey.species} · ${new Date(journey.points[0][0]*1000).getUTCFullYear()}`;
   ui.birdName.textContent=journey.species;ui.birdScientific.textContent=journey.scientificName;ui.journeySummary.textContent=journey.description;
-  ui.totalDistance.textContent=`${number.format(journey.totalDistanceKm)} km`;ui.totalDuration.textContent=`${journey.durationDays} ${journey.durationDays===1?'day':'days'}`;ui.fixCount.textContent=number.format(journey.points.length);ui.fixInterval.textContent=journey.medianIntervalSeconds<120?`${journey.medianIntervalSeconds} sec`:`${Math.round(journey.medianIntervalSeconds/60)} min`;
+  ui.totalDistance.textContent=`${number.format(journey.totalDistanceKm)} km`;ui.totalDuration.textContent=`${journey.durationDays} ${journey.durationDays===1?'day':'days'}`;ui.fixCount.textContent=number.format(journey.points.length);ui.fixInterval.textContent=journey.medianIntervalSeconds<120?`${journey.medianIntervalSeconds} sec`:formatDuration(journey.medianIntervalSeconds);
   ui.dayCount.textContent=`${journey.days.length} recorded days`;
   ui.startLabel.textContent=dateShort.format(new Date(journey.days[0].date+'T12:00:00Z'));ui.endLabel.textContent=dateShort.format(new Date(journey.days.at(-1).date+'T12:00:00Z'));
   ui.flightDays.replaceChildren(...journey.days.map((day,i)=>{const button=document.createElement('button');button.className='day-button';button.dataset.index=i;button.setAttribute('aria-label',`Fly day ${i+1}, ${day.date}`);button.innerHTML=`<span class="day-number">${String(i+1).padStart(2,'0')}</span><span class="day-text">${dateShort.format(new Date(day.date+'T12:00:00Z'))}<small>${number.format(day.fixes)} GPS fixes</small></span><span class="day-distance">${number.format(day.distanceKm)} km</span>`;button.addEventListener('click',()=>seekDay(i));return button;}));
@@ -148,7 +148,7 @@ function chooseJourney(id){
   for(const entity of routeEntities)viewer.entities.remove(entity);routeEntities=[];
   for(const segment of validSegments(journey)){
     const positions=segment.map(p=>C.Cartesian3.fromDegrees(p[1],p[2],p[3]==null?0:p[3]+60));
-    routeEntities.push(viewer.entities.add({polyline:{positions,width:2,clampToGround:journey.altitudeField===null,material:C.Color.fromCssColorString('#d4f76b').withAlpha(.75),arcType:C.ArcType.NONE}}));
+    routeEntities.push(viewer.entities.add({polyline:{positions,width:2,clampToGround:journey.altitudeField===null,material:C.Color.fromCssColorString('#d4f76b').withAlpha(.75),arcType:journey.altitudeField===null?C.ArcType.GEODESIC:C.ArcType.NONE}}));
   }
   map.setJourney(journey);drawChart();setMode(journey.recommendedMode??'first');updateUi(true);updateCamera(1);
   const url=new URL(location.href);url.searchParams.set('journey',id);history.replaceState(null,'',url);
