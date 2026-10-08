@@ -1,5 +1,5 @@
 {
-  "status": "locally_verified_pending_publication",
+  "status": "published_and_verified",
   "checks": {
     "flight_math_tests": 6,
     "syntax": "passed",
@@ -56,7 +56,10 @@
       "new stork gap notice has source-uncertain cause and local endpoints",
       "quiet preference dismisses new recording gap card",
       "backward Peter playback with stabilized Follow",
-      "320/390 px transport and new controls without horizontal overflow"
+      "320/390 px transport and new controls without horizontal overflow",
+      "public HTTPS expanded catalog: 12 species, 68 birds, 69 journeys",
+      "public Black kite 11 with stabilized Follow, Face forward and packaged weather",
+      "public console has no scene errors"
     ],
     "webmcp": {
       "valid_playback_input": "passed",
@@ -73,14 +76,21 @@
     "publication": {
       "site_http_status": 200,
       "catalog_http_status": 200,
-      "journeys": 13,
-      "species": 4,
-      "crane_repair_present": true,
+      "journeys": 69,
+      "species": 12,
+      "individuals": 68,
+      "catalog_hash_verified": true,
+      "camera_helper_hash_verified": true,
+      "weather_file_hash_verified": true,
+      "weather_journeys_hash_verified": [
+        "black_kite_11_2013",
+        "brown_pelican_ss07_2023",
+        "white_stork_castro_1720_d_ines_2020"
+      ],
       "github_pages_source": "GitHub Actions",
-      "last_verified_release": "936c05e77403e4059278404f21c485fbf5450075",
-      "note": "Public figures describe the preceding release. This expanded catalog and stabilization update has passed local verification and will be checked publicly after deployment.",
-      "individuals": 12,
-      "weather_file_hash_verified": true
+      "last_verified_release": "13f84d4e27d9d58bf095e3ef189957eaeae50941",
+      "deployment_run": "https://github.com/chenyangkang/Migration-Lens/actions/runs/37846446633",
+      "screenshot": "figures/08_diverse_migrations/migration_lens_diversity_stabilized_live.png"
     },
     "environment_and_individuals_tests": 6,
     "catalog": {
