@@ -2,12 +2,16 @@ import {sampleTrack,advancePlayback,validSegments,recordingGaps,clamp,radians,no
 import {gapDetails,formatDuration} from './gap_details.mjs';
 import {createTerrainProvider} from './terrain.js';
 import {MiniMap} from './mini_map.js';
+import {EnvironmentLayer} from './environment_layer.js';
+import {individualsForSpecies,migrationsForIndividual} from './individual_catalog.mjs';
 import {timeZoneAt,formatFlightTime,solarElevation,lightPhase} from './time_and_light.mjs';
 
 const $=id=>document.getElementById(id);
-const ui=Object.fromEntries(['loading','viewerError','viewerErrorText','speciesSelect','sourceBadge','flightStyle','resolutionNote','speedMetricLabel','gapCard','gapTitle','gapFrom','gapTo','gapExplanation','gapNightNote','gapCountdown','gapsButton','gapsDialog','gapsSummary','gapList','journeySelect','flightHeading','flightLocation','birdName','birdScientific','journeySummary','totalDistance','totalDuration','fixCount','fixInterval','flightDays','dayCount','currentDate','currentTime','timeBasis','timeContext','lightingButton','lightPhase','lightPreviewButton','lightPreviewPanel','lightPreviewTime','lightPreviewDate','lightPreviewPlayButton','lightPreviewTimeline','altitudeValue','speedValue','distanceValue','headingValue','compassNeedle','timeline','startLabel','endLabel','sampleStatus','mapProgress','altitudeChart','playButton','playLabel','playIcon','lookHint','terrainStatus','notice','sourcesDialog','sourceDetails'].map(id=>[id,$(id)]));
-const state={journeys:[],journey:null,time:0,playing:false,multiplier:60,mode:'first',lookYaw:0,lookPitch:0,frameTime:0,lastUi:0,lastNotice:0,currentDay:-1,overviewReady:false,cameraHeading:null,fov:67,timeBasis:'local',lighting:true,lightPreview:null,pendingGap:null,gaps:[]};
-let viewer,C,marker,map,routeEntities=[];
+const ui=Object.fromEntries(['individualSelect','jumpNoticesToggle','windToggle','precipitationToggle','temperatureToggle','weatherCard','weatherStatus','weatherReadings','weatherLegend','weatherCaption','mapHeading','loading','viewerError','viewerErrorText','speciesSelect','sourceBadge','flightStyle','resolutionNote','speedMetricLabel','gapCard','gapTitle','gapFrom','gapTo','gapExplanation','gapNightNote','gapCountdown','gapsButton','gapsDialog','gapsSummary','gapList','journeySelect','flightHeading','flightLocation','birdName','birdScientific','journeySummary','totalDistance','totalDuration','fixCount','fixInterval','flightDays','dayCount','currentDate','currentTime','timeBasis','timeContext','lightingButton','lightPhase','lightPreviewButton','lightPreviewPanel','lightPreviewTime','lightPreviewDate','lightPreviewPlayButton','lightPreviewTimeline','altitudeValue','speedValue','distanceValue','headingValue','compassNeedle','timeline','startLabel','endLabel','sampleStatus','mapProgress','altitudeChart','playButton','playLabel','playIcon','lookHint','terrainStatus','notice','sourcesDialog','sourceDetails'].map(id=>[id,$(id)]));
+const state={journeys:[],journey:null,time:0,playing:false,multiplier:60,mode:'first',lookYaw:0,lookPitch:0,frameTime:0,lastUi:0,lastNotice:0,currentDay:-1,overviewReady:false,cameraHeading:null,fov:67,timeBasis:'local',lighting:true,lightPreview:null,pendingGap:null,gaps:[],jumpNotices:true,environmentLayers:[]};
+let viewer,C,marker,map,environment,routeEntities=[];
+function savePreferences(){try{localStorage.setItem('migrationLensPreferences',JSON.stringify({jumpNotices:state.jumpNotices,environmentLayers:state.environmentLayers}));}catch{}}
+function restorePreferences(){try{const saved=JSON.parse(localStorage.getItem('migrationLensPreferences')??'{}');state.jumpNotices=saved.jumpNotices!==false;state.environmentLayers=Array.isArray(saved.environmentLayers)?saved.environmentLayers.filter(layer=>['wind','precipitation','temperature'].includes(layer)):[];}catch{}}
 const dateShort=new Intl.DateTimeFormat('en',{month:'short',day:'numeric',timeZone:'UTC'});
 const number=new Intl.NumberFormat('en',{maximumFractionDigits:0});
 
@@ -31,7 +35,7 @@ function updateGapCard(){
 function finishGap(){
   if(!state.pendingGap)return;
   const duration=formatDuration(state.pendingGap.duration);state.time=state.pendingGap.end;clearGap();state.cameraHeading=null;
-  notice(`Jumped to the next GPS fix · ${duration} without displayed positions`);updateUi(true);updateCamera(1);
+  if(state.jumpNotices)notice(`Jumped to the next GPS fix · ${duration} without displayed positions`);updateUi(true);updateCamera(1);
 }
 function inspectGap(index){
   const gap=state.gaps[index];if(!gap)return;
@@ -47,9 +51,55 @@ function renderGapList(){
     row.append(title,times);row.addEventListener('click',()=>{ui.gapsDialog.close();inspectGap(index);});return row;
   }));
 }
-function populateJourneys(species){
-  const entries=species==='all'?state.journeys:state.journeys.filter(j=>j.species===species);
-  ui.journeySelect.replaceChildren(...entries.map(j=>{const option=document.createElement('option');option.value=j.id;option.textContent=j.title;return option;}));
+function populateIndividuals(species,selected){
+  const entries=individualsForSpecies(state.journeys,species);
+  ui.individualSelect.replaceChildren(...entries.map(({individual,migrations})=>{
+    const option=document.createElement('option');option.value=individual;
+    option.textContent=`${individual}${migrations.length>1?` · ${migrations.length} migrations`:''}`;return option;
+  }));
+  if(entries.some(entry=>entry.individual===selected))ui.individualSelect.value=selected;
+}
+function populateJourneys(species,individual){
+  const entries=migrationsForIndividual(state.journeys,species,individual);
+  ui.journeySelect.replaceChildren(...entries.map(j=>{
+    const option=document.createElement('option');option.value=j.id;
+    option.textContent=`${new Date(j.points[0][0]*1000).getUTCFullYear()} · ${j.title.split(' · ').slice(1).join(' · ')}`;return option;
+  }));
+}
+function setJumpNotices(enabled){
+  state.jumpNotices=enabled;ui.jumpNoticesToggle.checked=enabled;
+  if(!enabled){ui.notice.hidden=true;if(state.pendingGap&&state.playing)finishGap();else clearGap();}
+  savePreferences();
+}
+function setEnvironmentLayers(layers){
+  state.environmentLayers=layers;
+  for(const layer of ['wind','precipitation','temperature'])ui[`${layer}Toggle`].checked=layers.includes(layer);
+  environment.setLayers(layers);savePreferences();updateEnvironment();if(state.journey)map.update(state.time);
+}
+function updateEnvironment(){
+  if(!state.journey||!environment)return;
+  const enabled=state.environmentLayers.length>0;ui.weatherCard.hidden=!enabled;
+  ui.weatherCaption.textContent=`Surface estimates · 1° display samples${state.environmentLayers.includes('wind')?'\nArrows point where wind blows':''}`;
+  document.querySelector('.flight-stage').classList.toggle('has-weather',enabled);
+  ui.mapHeading.textContent=enabled?'WEATHER NEAR THE BIRD':'THE JOURNEY';
+  const position=sampleTrack(state.journey,state.time);
+  map.setEnvironment(environment.data,state.environmentLayers);
+  if(!enabled){ui.weatherLegend.replaceChildren();return;}
+  if(!environment.data){
+    ui.weatherStatus.textContent=environment.error?'Weather could not load. Clear layers and retry.':'Loading historical weather…';
+    ui.weatherReadings.replaceChildren();ui.weatherLegend.replaceChildren();return;
+  }
+  const reading=environment.sample(state.time,position.longitude,position.latitude);
+  environment.update(state.time,position);
+  if(!reading){ui.weatherStatus.textContent='No weather samples at this position and time.';ui.weatherReadings.replaceChildren();return;}
+  const clock=formatFlightTime(reading.time,timeZoneAt(state.journey,position));
+  ui.weatherStatus.textContent=`${state.timeBasis==='utc'?clock.utcTime+' UTC':clock.time+' local'} · hourly snapshot${gapInside(state.time)||state.pendingGap?' · held GPS fix':''}${state.lightPreview?' · flight time held':''}`;
+  const rows=[];
+  if(state.environmentLayers.includes('wind'))rows.push(['Wind',reading.wind?(reading.wind.speed<.15?'Calm · <0.5 km/h':`${(reading.wind.speed*3.6).toFixed(1)} km/h · from ${reading.wind.cardinal} (${Math.round(reading.wind.from)}°)`):'Unavailable']);
+  if(state.environmentLayers.includes('precipitation'))rows.push(['Precipitation',reading.precipitation==null?'Unavailable':`${reading.precipitation.toFixed(2)} mm · preceding hour`]);
+  if(state.environmentLayers.includes('temperature'))rows.push(['Temperature',reading.temperature==null?'Unavailable':`${reading.temperature.toFixed(1)} °C · at 2 m`]);
+  ui.weatherReadings.replaceChildren(...rows.map(([name,value])=>{const row=document.createElement('div');row.className='weather-reading';const label=document.createElement('span');label.textContent=name;const metric=document.createElement('b');metric.textContent=value;row.append(label,metric);return row;}));
+  ui.weatherLegend.replaceChildren(...state.environmentLayers.map(layer=>{const row=document.createElement('div');row.className=`weather-scale ${layer}`;const swatch=document.createElement('i');const label=document.createElement('span');label.textContent=layer==='temperature'?'−15 → 45 °C':layer==='precipitation'?'Blue intensity: 0 → 5+ mm':'Longer arrows: stronger wind';row.append(swatch,label);return row;}));
 }
 
 function setLighting(enabled){
@@ -125,12 +175,12 @@ function chooseJourney(id){
   const journey=state.journeys.find(j=>j.id===id);if(!journey)return;
   stopLightPreview();clearGap();
   setPlaying(false);state.journey=journey;state.currentDay=-1;state.time=journey.points[journey.previewIndex][0];state.lookYaw=0;state.lookPitch=0;state.cameraHeading=null;
-  if(ui.speciesSelect.value!=='all'&&ui.speciesSelect.value!==journey.species)ui.speciesSelect.value=journey.species;
-  populateJourneys(ui.speciesSelect.value);ui.journeySelect.value=id;
+  ui.speciesSelect.value=journey.species;populateIndividuals(journey.species,journey.individual);
+  populateJourneys(journey.species,journey.individual);ui.journeySelect.value=id;
   ui.sourceBadge.textContent=journey.sourceLabel??'Movebank archive';ui.flightStyle.textContent=journey.flightStyle??'SOARING MIGRANT';
   ui.resolutionNote.textContent=journey.resolutionNote??'Measured GPS track · approximate GPS altitude';
   state.gaps=recordingGaps(journey);ui.gapsButton.textContent=`Recording gaps (${state.gaps.length})`;
-  ui.gapsSummary.textContent=`Intervals longer than ${formatDuration(journey.maxInterpolationGapSeconds)} are skipped after a visible transition. Gaps refer to the displayed selection; the source archive may contain other observations.`;
+  ui.gapsSummary.textContent=`Intervals longer than ${formatDuration(journey.maxInterpolationGapSeconds)} are marked on the timeline and skipped; visible notices are optional. Gaps refer to the displayed selection; the source archive may contain other observations.`;
   renderGapList();
   ui.journeySelect.value=id;ui.flightHeading.textContent=journey.subtitle;ui.flightLocation.textContent=`${journey.individual} · ${journey.species} · ${new Date(journey.points[0][0]*1000).getUTCFullYear()}`;
   ui.birdName.textContent=journey.species;ui.birdScientific.textContent=journey.scientificName;ui.journeySummary.textContent=journey.description;
@@ -143,14 +193,14 @@ function chooseJourney(id){
   for(const [key,value] of [['Bird',journey.individual],['Archive study',journey.studyId],['GPS interval',`${journey.medianIntervalSeconds} seconds (median of retained fixes)`],['Altitude',journey.altitudeDatum],['Distance',journey.distanceDefinition],['Reuse',journey.licence]]){const dt=document.createElement('dt');dt.textContent=key;const dd=document.createElement('dd');dd.textContent=value;dl.append(dt,dd);}
   ui.sourceDetails.append(dl);
   const source=document.createElement('p');source.textContent=journey.citation+' ';const link=document.createElement('a');link.href=journey.sourceDoi;link.textContent='Open tracking archive';link.target='_blank';link.rel='noopener';source.append(link);ui.sourceDetails.append(source);
-  if(journey.publication){const paper=document.createElement('p');const paperLink=document.createElement('a');paperLink.href=journey.publication;paperLink.textContent=journey.publicationTitle??'Related research: weather and migration stopovers';paperLink.target='_blank';paperLink.rel='noopener';paper.append(paperLink);if(journey.individual==='Peter')paper.append(document.createTextNode(' — this paper analysed earlier migrations (2006–2019), rather than Peter’s 2021 flight.'));ui.sourceDetails.append(paper);}
+  if(journey.publication){const paper=document.createElement('p');const paperLink=document.createElement('a');paperLink.href=journey.publication;paperLink.textContent=journey.publicationTitle??'Related research: weather and migration stopovers';paperLink.target='_blank';paperLink.rel='noopener';paper.append(paperLink);if(journey.individual==='Peter'||journey.individual==='Steve')paper.append(document.createTextNode(' — this paper analysed earlier migrations (2006–2019), rather than this individual’s 2021 flight.'));ui.sourceDetails.append(paper);}
   const method=document.createElement('p');method.textContent='Selection: '+journey.curation;ui.sourceDetails.append(method);
   for(const entity of routeEntities)viewer.entities.remove(entity);routeEntities=[];
   for(const segment of validSegments(journey)){
     const positions=segment.map(p=>C.Cartesian3.fromDegrees(p[1],p[2],p[3]==null?0:p[3]+60));
     routeEntities.push(viewer.entities.add({polyline:{positions,width:2,clampToGround:journey.altitudeField===null,material:C.Color.fromCssColorString('#d4f76b').withAlpha(.75),arcType:journey.altitudeField===null?C.ArcType.GEODESIC:C.ArcType.NONE}}));
   }
-  map.setJourney(journey);drawChart();setMode(journey.recommendedMode??'first');updateUi(true);updateCamera(1);
+  environment.setJourney(journey);map.setJourney(journey);drawChart();setMode(journey.recommendedMode??'first');updateUi(true);updateCamera(1);
   const url=new URL(location.href);url.searchParams.set('journey',id);history.replaceState(null,'',url);
 }
 
@@ -175,7 +225,7 @@ function updateUi(force=false){
   $('streetViewLink').href=`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${sample.latitude.toFixed(5)},${sample.longitude.toFixed(5)}`;
   ui.mapProgress.textContent=`${Math.round(sample.distance/j.totalDistanceKm*100)}% of observed route`;
   const day=activeDay();if(day!==state.currentDay||force){state.currentDay=day;[...ui.flightDays.children].forEach((button,i)=>{button.classList.toggle('active',i===day);button.setAttribute('aria-current',i===day?'true':'false');});}
-  map.update(state.time);
+  updateEnvironment();map.update(state.time);
   updateLighting();
 }
 
@@ -225,7 +275,7 @@ function animationFrame(now){
   if(state.lightPreview?.playing){state.lightPreview.minutes+=dt*30;if(state.lightPreview.minutes>=1440){state.lightPreview.minutes=1440;setLightPreviewPlaying(false);}updateLighting();}
   if(state.playing){
     if(state.pendingGap){state.pendingGap.remaining-=dt;if(state.pendingGap.remaining<=0)finishGap();}
-    else{const result=advancePlayback(state.journey,state.time,dt,state.multiplier,{stopAtGap:true});state.time=result.time;if(result.gap)showGap(result.gap);if(result.ended)setPlaying(false);}
+    else{const result=advancePlayback(state.journey,state.time,dt,state.multiplier,{stopAtGap:state.jumpNotices});state.time=result.time;if(result.gap)showGap(result.gap);if(result.ended)setPlaying(false);}
   }
   if(viewer&&state.journey&&state.mode!=='overview'&&(state.playing||now-state.lastUi>180))updateCamera(dt);
   if(now-state.lastUi>180){updateUi();state.lastUi=now;}
@@ -236,14 +286,18 @@ function animationFrame(now){
 function bindControls(){
   $('firstPersonButton').addEventListener('click',()=>setMode('first'));$('followButton').addEventListener('click',()=>setMode('follow'));$('overviewButton').addEventListener('click',()=>setMode('overview'));
   $('mapExpandButton').addEventListener('click',()=>setMode('overview'));
-  ui.speciesSelect.addEventListener('change',event=>{populateJourneys(event.target.value);const entries=event.target.value==='all'?state.journeys:state.journeys.filter(j=>j.species===event.target.value);chooseJourney(entries.some(j=>j.id===state.journey.id)?state.journey.id:entries[0].id);});
+  ui.speciesSelect.addEventListener('change',event=>chooseJourney(state.journeys.find(j=>j.species===event.target.value).id));
+  ui.individualSelect.addEventListener('change',event=>chooseJourney(migrationsForIndividual(state.journeys,ui.speciesSelect.value,event.target.value)[0].id));
+  ui.jumpNoticesToggle.addEventListener('change',event=>setJumpNotices(event.target.checked));
+  for(const layer of ['wind','precipitation','temperature'])ui[`${layer}Toggle`].addEventListener('change',()=>setEnvironmentLayers(['wind','precipitation','temperature'].filter(name=>ui[`${name}Toggle`].checked)));
+  $('clearEnvironmentButton').addEventListener('click',()=>{environment.error=false;setEnvironmentLayers([]);});
   $('skipGapButton').addEventListener('click',finishGap);$('pauseGapButton').addEventListener('click',()=>{setPlaying(false);updateGapCard();});
   ui.gapsButton.addEventListener('click',()=>{setPlaying(false);renderGapList();ui.gapsDialog.showModal();});$('closeGapsButton').addEventListener('click',()=>ui.gapsDialog.close());
   ui.journeySelect.addEventListener('change',event=>chooseJourney(event.target.value));
   ui.playButton.addEventListener('click',()=>{stopLightPreview();if(state.time>=state.journey.points.at(-1)[0])state.time=state.journey.points[0][0];setPlaying(!state.playing);});
   $('previousDayButton').addEventListener('click',()=>seekDay(activeDay()-1));$('nextDayButton').addEventListener('click',()=>seekDay(activeDay()+1));
   $('speedSelect').addEventListener('change',event=>state.multiplier=Number(event.target.value));
-  ui.timeline.addEventListener('input',event=>{stopLightPreview();clearGap();const p=state.journey.points;state.time=p[0][0]+Number(event.target.value)/1000*(p.at(-1)[0]-p[0][0]);state.cameraHeading=null;const gap=gapInside(state.time);if(gap)showGap(gap);updateUi(true);updateCamera(1);});
+  ui.timeline.addEventListener('input',event=>{stopLightPreview();clearGap();const p=state.journey.points;state.time=p[0][0]+Number(event.target.value)/1000*(p.at(-1)[0]-p[0][0]);state.cameraHeading=null;const gap=gapInside(state.time);if(gap&&state.jumpNotices)showGap(gap);updateUi(true);updateCamera(1);});
   ui.timeBasis.addEventListener('change',event=>{state.timeBasis=event.target.value;updateUi(true);});
   ui.lightingButton.addEventListener('click',()=>{if(state.lightPreview)stopLightPreview();setLighting(!state.lighting);updateLighting();});
   ui.lightPreviewButton.addEventListener('click',()=>state.lightPreview?stopLightPreview():startLightPreview());
@@ -269,10 +323,10 @@ async function registerTools(){
   if(!context?.registerTool)return;
   const lifecycle=new AbortController();
   window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
-  await context.registerTool({name:'configure_migration_playback',title:'Configure migration playback',description:'Select a tracked migration, flight day, camera, local/UTC clock and flight-time/daylight lighting. Preview 24 hours of sunlight at a held track position without changing bird movement. Changes the visible viewer only.',inputSchema:{type:'object',properties:{journey:{type:'string',enum:state.journeys.map(j=>j.id)},day:{type:'integer',minimum:1},gap:{type:'integer',minimum:1,description:'Inspect a numbered recording gap; holds at its last fix.'},camera:{type:'string',enum:['first','follow','overview']},playing:{type:'boolean'},clock:{type:'string',enum:['local','utc']},lighting:{type:'string',enum:['flight','daylight']},lightPreviewMinutes:{type:'number',minimum:0,maximum:1440},lightPreviewPlaying:{type:'boolean'}},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async(input)=>{
+  await context.registerTool({name:'configure_migration_playback',title:'Configure migration playback',description:'Select a tracked migration, flight day, camera, local/UTC clock, surface weather overlays, jump notices and flight-time/daylight lighting. Preview 24 hours of sunlight at a held track position without changing bird movement. Changes the visible viewer only.',inputSchema:{type:'object',properties:{journey:{type:'string',enum:state.journeys.map(j=>j.id)},day:{type:'integer',minimum:1},gap:{type:'integer',minimum:1,description:'Inspect a numbered recording gap; holds at its last fix.'},camera:{type:'string',enum:['first','follow','overview']},playing:{type:'boolean'},clock:{type:'string',enum:['local','utc']},lighting:{type:'string',enum:['flight','daylight']},lightPreviewMinutes:{type:'number',minimum:0,maximum:1440},lightPreviewPlaying:{type:'boolean'},jumpNotices:{type:'boolean'},environment:{type:'array',items:{type:'string',enum:['wind','precipitation','temperature']},uniqueItems:true}},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async(input)=>{
     if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Expected playback options.');
-    const {journey,day,gap,camera,playing,clock,lighting,lightPreviewMinutes,lightPreviewPlaying}=input;
-    if(Object.keys(input).some(key=>!['journey','day','gap','camera','playing','clock','lighting','lightPreviewMinutes','lightPreviewPlaying'].includes(key)))throw new Error('Unknown playback option.');
+    const {journey,day,gap,camera,playing,clock,lighting,lightPreviewMinutes,lightPreviewPlaying,jumpNotices,environment:layers}=input;
+    if(Object.keys(input).some(key=>!['journey','day','gap','camera','playing','clock','lighting','lightPreviewMinutes','lightPreviewPlaying','jumpNotices','environment'].includes(key)))throw new Error('Unknown playback option.');
     const selected=journey===undefined?state.journey:state.journeys.find(j=>j.id===journey);
     if(!selected)throw new Error('Unknown journey.');
     if(day!==undefined&&(!Number.isInteger(day)||day<1||day>selected.days.length))throw new Error('Flight day is outside the recorded journey.');
@@ -283,6 +337,8 @@ async function registerTools(){
     if(lighting!==undefined&&!['flight','daylight'].includes(lighting))throw new Error('Unknown lighting mode.');
     if(lightPreviewMinutes!==undefined&&(!Number.isFinite(lightPreviewMinutes)||lightPreviewMinutes<0||lightPreviewMinutes>1440))throw new Error('Lighting preview must be between 0 and 1440 minutes.');
     if(lightPreviewPlaying!==undefined&&typeof lightPreviewPlaying!=='boolean')throw new Error('Lighting preview playing must be true or false.');
+    if(jumpNotices!==undefined&&typeof jumpNotices!=='boolean')throw new Error('Jump notices must be true or false.');
+    if(layers!==undefined&&(!Array.isArray(layers)||layers.some(layer=>!['wind','precipitation','temperature'].includes(layer))||new Set(layers).size!==layers.length))throw new Error('Select valid environment layers.');
     const previewRequested=lightPreviewMinutes!==undefined||lightPreviewPlaying!==undefined;
     if(previewRequested&&(playing===true||lighting==='daylight'))throw new Error('Lighting preview holds position and requires day/night lighting.');
     if(journey!==undefined)chooseJourney(journey);if(day!==undefined)seekDay(day-1);if(gap!==undefined)inspectGap(gap-1);if(camera)setMode(camera);
@@ -293,8 +349,9 @@ async function registerTools(){
       if(!state.lightPreview)startLightPreview(lightPreviewMinutes??0,lightPreviewPlaying??false);
       else{if(lightPreviewMinutes!==undefined){state.lightPreview.minutes=lightPreviewMinutes;setLightPreviewPlaying(false);}if(lightPreviewPlaying!==undefined)setLightPreviewPlaying(lightPreviewPlaying);}
     }
+    if(jumpNotices!==undefined)setJumpNotices(jumpNotices);if(layers!==undefined)setEnvironmentLayers(layers);
     updateUi(true);updateCamera(1);
-    return {journey:state.journey.id,time:state.time,camera:state.mode,playing:state.playing,clock:state.timeBasis,lighting:state.lighting?'flight':'daylight',lightPreviewMinutes:state.lightPreview?.minutes??null};
+    return {jumpNotices:state.jumpNotices,environment:state.environmentLayers,journey:state.journey.id,time:state.time,camera:state.mode,playing:state.playing,clock:state.timeBasis,lighting:state.lighting?'flight':'daylight',lightPreviewMinutes:state.lightPreview?.minutes??null};
   }},{signal:lifecycle.signal});
 }
 
@@ -314,7 +371,9 @@ async function start(){
     marker=viewer.entities.add({point:{pixelSize:12,color:C.Color.fromCssColorString('#d4f76b'),outlineColor:C.Color.fromCssColorString('#0e251c'),outlineWidth:2,disableDepthTestDistance:Number.POSITIVE_INFINITY}});
     viewer.scene.renderError.addEventListener((_scene,error)=>failure('The 3D scene encountered a graphics problem. Reload the page or try a browser with hardware acceleration.'));
     imagery.errorEvent.addEventListener(()=>{ui.terrainStatus.textContent='Imagery coverage varies · 3D terrain';});
-    map=new MiniMap($('miniMap'));const all=document.createElement('option');all.value='all';all.textContent='All species';ui.speciesSelect.replaceChildren(all,...[...new Set(state.journeys.map(j=>j.species))].map(species=>{const option=document.createElement('option');option.value=species;option.textContent=species;return option;}));populateJourneys('all');
+    map=new MiniMap($('miniMap'));environment=new EnvironmentLayer(viewer,C,()=>updateEnvironment());
+    ui.speciesSelect.replaceChildren(...[...new Set(state.journeys.map(j=>j.species))].map(species=>{const option=document.createElement('option');option.value=species;option.textContent=species;return option;}));
+    restorePreferences();ui.jumpNoticesToggle.checked=state.jumpNotices;setEnvironmentLayers(state.environmentLayers);
     bindControls();const selected=new URL(location.href).searchParams.get('journey');chooseJourney(state.journeys.some(j=>j.id===selected)?selected:state.journeys[0].id);
     viewer.scene.globe.tileLoadProgressEvent.addEventListener(remaining=>{if(remaining===0&&viewer.scene.globe.tilesLoaded)ui.loading.hidden=true;});
     setTimeout(()=>{ui.loading.hidden=true;},12000);

@@ -1,0 +1,79 @@
+{
+  "localTime": {
+    "boundaryLibrary": "timezonefinder 8.2.2, full timezones-with-oceans dataset",
+    "boundarySource": "https://github.com/evansiroky/timezone-boundary-builder",
+    "rules": "IANA timezone database; browser Intl.DateTimeFormat for historical offsets and DST",
+    "positionMethod": "Nearest retained GPS fix; no location API requests.",
+    "flightDays": "Civil dates at each recorded fix; original UTC\u22127 curation windows retain the same observations."
+  },
+  "sourceManifests": [
+    "data_manifest.json",
+    "multi_species_manifest.json"
+  ],
+  "tracks": [
+    {
+      "id": "steve_2021",
+      "species": "Turkey vulture",
+      "individual": "Steve",
+      "curation": "Visible Turkey Vulture GPS observations only; marked outliers removed; duplicate timestamps removed; numeric raw heights outside -100 to 6500 removed; UTC\u22127 selection windows trimmed to first and last fixes with ground speed \u22654 m/s; isolated inter-fix speeds >40 m/s removed.",
+      "sourceDoi": "https://doi.org/10.5441/001/1.f3qt46r2",
+      "fixes": 234
+    },
+    {
+      "id": "white_fronted_goose_180937_2021",
+      "species": "Greater white-fronted goose",
+      "individual": "gwf_180937.1",
+      "curation": "Published bout gwf_180937.1_118_4; used=1 GPS observations only; model altitude bands excluded; duplicate timestamps removed; original GPS heights outside \u2212100 to 6500 m excluded; night observations retained.",
+      "sourceDoi": "https://doi.org/10.5066/P9VUN0Q9",
+      "fixes": 327
+    },
+    {
+      "id": "white_fronted_goose_171633_2019",
+      "species": "Greater white-fronted goose",
+      "individual": "gwf_171633.1",
+      "curation": "Published bout gwf_171633.1_14_4; used=1 GPS observations only; model altitude bands excluded; duplicate timestamps removed; original GPS heights outside \u2212100 to 6500 m excluded; night observations retained.",
+      "sourceDoi": "https://doi.org/10.5066/P9VUN0Q9",
+      "fixes": 383
+    },
+    {
+      "id": "white_fronted_goose_171615_2019",
+      "species": "Greater white-fronted goose",
+      "individual": "gwf_171615.1",
+      "curation": "Published bout gwf_171615.1_4_4; used=1 GPS observations only; model altitude bands excluded; duplicate timestamps removed; original GPS heights outside \u2212100 to 6500 m excluded; night observations retained.",
+      "sourceDoi": "https://doi.org/10.5066/P9VUN0Q9",
+      "fixes": 250
+    },
+    {
+      "id": "snow_goose_171625_2019",
+      "species": "Snow goose",
+      "individual": "lsn_171625.1",
+      "curation": "Published bout lsn_171625.1_55_4; used=1 GPS observations only; model altitude bands excluded; duplicate timestamps removed; original GPS heights outside \u2212100 to 6500 m excluded; night observations retained.",
+      "sourceDoi": "https://doi.org/10.5066/P9VUN0Q9",
+      "fixes": 35
+    },
+    {
+      "id": "snow_goose_193468_2020",
+      "species": "Snow goose",
+      "individual": "lsn_193468.2",
+      "curation": "Published bout lsn_193468.2_148_1; used=1 GPS observations only; model altitude bands excluded; duplicate timestamps removed; original GPS heights outside \u2212100 to 6500 m excluded; night observations retained.",
+      "sourceDoi": "https://doi.org/10.5066/P9VUN0Q9",
+      "fixes": 159
+    },
+    {
+      "id": "sandhill_crane_100843_2013",
+      "species": "Sandhill crane",
+      "individual": "100843",
+      "curation": "Individual 100843; duplicate timestamps removed, sorted by UTC. Published kilometre X/Y coordinates inverted using the exact AEQD/GRS80 projection parameters (centre 51\u00b0 N, 110\u00b0 W). Altitude and instantaneous speed were not released.",
+      "sourceDoi": "https://doi.org/10.5066/F7F76BGR",
+      "fixes": 119
+    },
+    {
+      "id": "sandhill_crane_100854_2013",
+      "species": "Sandhill crane",
+      "individual": "100854",
+      "curation": "Individual 100854; duplicate timestamps removed, sorted by UTC. Published kilometre X/Y coordinates inverted using the exact AEQD/GRS80 projection parameters (centre 51\u00b0 N, 110\u00b0 W). Altitude and instantaneous speed were not released.",
+      "sourceDoi": "https://doi.org/10.5066/F7F76BGR",
+      "fixes": 114
+    }
+  ]
+}

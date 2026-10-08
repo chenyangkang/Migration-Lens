@@ -9,7 +9,7 @@ const catalog=JSON.parse(readFileSync(new URL('../../resources/configs/journey_c
 const journeys=catalog.datasets.flatMap(file=>JSON.parse(readFileSync(new URL('../../'+file,import.meta.url))).journeys);
 
 test('all four species share a validated catalog with unique journey identities',()=>{
-  assert.equal(validateJourneys(journeys).length,5);
+  assert.equal(validateJourneys(journeys).length,13);
   assert.equal(new Set(journeys.map(j=>j.species)).size,4);
   assert.throws(()=>validateJourneys([...journeys,journeys[0]]),/unique/);
 });

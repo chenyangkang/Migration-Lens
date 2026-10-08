@@ -8,6 +8,8 @@ await cp(path.join(root,'scripts/02_web_app'),path.join(root,'dist'),{recursive:
 await cp(path.join(root,'scripts/01_shared_helpers/flight_math.mjs'),path.join(root,'dist/flight_math.mjs'));
 await cp(path.join(root,'scripts/01_shared_helpers/time_and_light.mjs'),path.join(root,'dist/time_and_light.mjs'));
 await cp(path.join(root,'scripts/01_shared_helpers/gap_details.mjs'),path.join(root,'dist/gap_details.mjs'));
+for(const helper of ['individual_catalog.mjs','environment_math.mjs'])await cp(path.join(root,'scripts/01_shared_helpers',helper),path.join(root,'dist',helper));
+await cp(path.join(root,'data/06_environment'),path.join(root,'dist/data/environment'),{recursive:true});
 const catalog=JSON.parse(await readFile(path.join(root,'resources/configs/journey_catalog.json'),'utf8'));
 const datasets=await Promise.all(catalog.datasets.map(async file=>JSON.parse(await readFile(path.join(root,file),'utf8'))));
 const journeys=validateJourneys(datasets.flatMap(data=>data.journeys));

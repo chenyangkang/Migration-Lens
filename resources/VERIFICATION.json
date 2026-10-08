@@ -30,7 +30,18 @@
       "crane ground route and illustrative first-person height",
       "hatched timeline and dashed route gaps",
       "public HTTPS startup with five journeys",
-      "390 px phone controls without horizontal overflow"
+      "390 px phone controls without horizontal overflow",
+      "three individuals per species",
+      "individual selection for snow goose and crane",
+      "2019/2021 migrations of one goose",
+      "three weather layers together",
+      "precipitation-only layer on a wet recorded day",
+      "None clears overlays and returns the route map",
+      "quiet overnight skip without countdown/card/toast",
+      "jump notice preference survives reload",
+      "weather-layer preferences survive reload",
+      "390 px weather card and map do not overlap",
+      "nearby wind arrows in first-person view"
     ],
     "webmcp": {
       "valid_playback_input": "passed",
@@ -40,7 +51,7 @@
     "startup_loading": "passed",
     "local_asset_delivery": "passed",
     "time_and_light_tests": 6,
-    "total_tests": 17,
+    "total_tests": 23,
     "local_time": "full geographic timezone boundaries and historical DST verified",
     "sunlight": "flight timestamps drive Cesium sun, terrain and atmosphere; fade adjusted at flight height",
     "gaps_and_catalog_tests": 5,
@@ -50,7 +61,25 @@
       "journeys": 5,
       "species": 4,
       "crane_repair_present": true,
-      "github_pages_source": "GitHub Actions"
+      "github_pages_source": "GitHub Actions",
+      "last_verified_release": "0826c39691cda68a064051a7a2dd797f39e2bef9",
+      "note": "Publication checks below refer to the prior release. The expanded local catalog and weather are tested above; the workflow publishes them on push."
+    },
+    "environment_and_individuals_tests": 6,
+    "catalog": {
+      "species": 4,
+      "individuals": 12,
+      "journeys": 13,
+      "individuals_per_species": 3
+    },
+    "environment": {
+      "source": "ERA5 via Open-Meteo",
+      "hours": "UTC, 3600-second spacing",
+      "native_grid_degrees": 0.25,
+      "display_sampling_degrees": 1,
+      "units": "temperature 2m \u00b0C; precipitation preceding hour mm; wind 10m m/s stored as east/north vectors",
+      "coverage": "every recorded fix and segment midpoint validated",
+      "hosting": "static per-journey JSON, lazy loaded; no browser weather API calls"
     }
   },
   "limitations": [
@@ -59,7 +88,8 @@
     "Custom-licensed osprey data omitted pending owner permission.",
     "Satellite and terrain imagery may vary in date, resolution and coverage.",
     "Sunlight model omits weather, artificial lighting and bird visual sensitivity; 24h preview holds position.",
-    "Crane altitude not released; sparse fixes use illustrative viewing height. Goose and crane speeds are estimated segment means."
+    "Crane altitude not released; sparse fixes use illustrative viewing height. Goose and crane speeds are estimated segment means.",
+    "Environment layers are hourly surface reanalysis estimates sampled at 1\u00b0; wind at bird flight altitude, turbulence and fine-scale weather are not measured."
   ],
   "product_url_local": "http://127.0.0.1:4173/",
   "publication": "Published through GitHub Pages; future pushes to main test, build and deploy automatically.",

@@ -3,7 +3,7 @@ export function validateJourneys(journeys) {
   for(const journey of journeys){
     if(!journey.id||ids.has(journey.id))throw new Error('Journey IDs must be present and unique.');
     ids.add(journey.id);
-    for(const field of ['species','scientificName','sourceDoi','citation','licence','altitudeDatum']){
+    for(const field of ['individual','species','scientificName','sourceDoi','citation','licence','altitudeDatum']){
       if(typeof journey[field]!=='string'||!journey[field])throw new Error(`${journey.id}: ${field} is required.`);
     }
     if(!Number.isFinite(journey.maxInterpolationGapSeconds)||journey.maxInterpolationGapSeconds<=0)throw new Error(`${journey.id}: invalid interpolation limit.`);
