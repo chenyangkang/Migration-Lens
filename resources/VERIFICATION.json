@@ -1,5 +1,5 @@
 {
-  "status": "published_and_verified",
+  "status": "locally_verified_pending_publication",
   "checks": {
     "flight_math_tests": 6,
     "syntax": "passed",
@@ -47,7 +47,16 @@
       "accelerated backward playback moves the historical clock backward",
       "backward gap card jumps to the previous fix",
       "320/390 px transport controls fit without horizontal overflow",
-      "desktop rewind controls fit in the playback footer"
+      "desktop rewind controls fit in the playback footer",
+      "all eight added species load without scene errors",
+      "new individual selection: Black kite 11, Brown pelican SS07, White stork Castro_1720_D. Ines",
+      "all three packaged weather readings load for black kite and brown pelican",
+      "stabilized Follow and Face forward",
+      "stabilization checkbox survives reload while unchecked",
+      "new stork gap notice has source-uncertain cause and local endpoints",
+      "quiet preference dismisses new recording gap card",
+      "backward Peter playback with stabilized Follow",
+      "320/390 px transport and new controls without horizontal overflow"
     ],
     "webmcp": {
       "valid_playback_input": "passed",
@@ -57,7 +66,7 @@
     "startup_loading": "passed",
     "local_asset_delivery": "passed",
     "time_and_light_tests": 6,
-    "total_tests": 28,
+    "total_tests": 38,
     "local_time": "full geographic timezone boundaries and historical DST verified",
     "sunlight": "flight timestamps drive Cesium sun, terrain and atmosphere; fade adjusted at flight height",
     "gaps_and_catalog_tests": 5,
@@ -68,17 +77,30 @@
       "species": 4,
       "crane_repair_present": true,
       "github_pages_source": "GitHub Actions",
-      "last_verified_release": "2ec9c45d006faa9773fe2e7598711329270946f4",
-      "note": "Public catalog and weather checks refer to the prior release. The navigation update is tested locally above and published by the workflow on push.",
+      "last_verified_release": "936c05e77403e4059278404f21c485fbf5450075",
+      "note": "Public figures describe the preceding release. This expanded catalog and stabilization update has passed local verification and will be checked publicly after deployment.",
       "individuals": 12,
       "weather_file_hash_verified": true
     },
     "environment_and_individuals_tests": 6,
     "catalog": {
-      "species": 4,
-      "individuals": 12,
-      "journeys": 13,
-      "individuals_per_species": 3
+      "species": 12,
+      "individuals": 68,
+      "journeys": 69,
+      "individuals_per_species": {
+        "Turkey vulture": 7,
+        "Greater white-fronted goose": 13,
+        "Snow goose": 5,
+        "Sandhill crane": 5,
+        "White stork": 3,
+        "Black kite": 8,
+        "Orinoco goose": 2,
+        "Barnacle goose": 7,
+        "Taiga bean goose": 6,
+        "Brown pelican": 4,
+        "Demoiselle crane": 4,
+        "White-naped crane": 4
+      }
     },
     "environment": {
       "source": "ERA5 via Open-Meteo",
@@ -86,19 +108,38 @@
       "native_grid_degrees": 0.25,
       "display_sampling_degrees": 1,
       "units": "temperature 2m \u00b0C; precipitation preceding hour mm; wind 10m m/s stored as east/north vectors",
-      "coverage": "every recorded fix and segment midpoint validated",
-      "hosting": "static per-journey JSON, lazy loaded; no browser weather API calls"
+      "coverage": "Every recorded fix and five interior fractions (.1, .25, .5, .75, .9) of every interpolated segment validated for temperature and wind.",
+      "hosting": "static per-journey JSON, lazy loaded; no browser weather API calls",
+      "journeys": 69,
+      "total_static_bytes": 70014474
     },
-    "reverse_playback_tests": 5
+    "reverse_playback_tests": 5,
+    "camera_stabilization_tests": 6,
+    "diversity_catalog_tests": 4,
+    "expanded_source_verification": {
+      "movebank_retained_gps_events": 45158,
+      "comparison": "Original event identifiers, UTC timestamps, rounded longitude/latitude, individual identifier and scientific name checked against downloaded source CSVs; no synthetic GPS fixes."
+    },
+    "camera_stabilization": {
+      "default": "on, with persistent optional checkbox",
+      "heading_window": "Ten minutes to twelve hours total initially, based on GPS spacing; expands up to threefold when direction is weak, within one recorded segment.",
+      "stationary_or_circling": "hold previous heading when no reliable displacement exists",
+      "turn_limit_degrees_per_wall_second": 28,
+      "horizontal_camera_offset_limit_m": 150,
+      "peter_heading_target_variation_reduction_percent": 84.01,
+      "recorded_fixes": "unchanged; marker, route and readings use original/interpolated GPS positions"
+    }
   },
   "limitations": [
-    "Raw GPS height vertical datum unspecified; camera height approximate.",
+    "GPS heights retain their published datum; no geoid conversion is claimed, and viewing height can be raised above terrain.",
     "One-second eagle raw file unavailable; omitted.",
     "Custom-licensed osprey data omitted pending owner permission.",
     "Satellite and terrain imagery may vary in date, resolution and coverage.",
     "Sunlight model omits weather, artificial lighting and bird visual sensitivity; 24h preview holds position.",
-    "Crane altitude not released; sparse fixes use illustrative viewing height. Goose and crane speeds are estimated segment means.",
-    "Environment layers are hourly surface reanalysis estimates sampled at 1\u00b0; wind at bird flight altitude, turbulence and fine-scale weather are not measured."
+    "USGS crane altitude was not released; pelican, barnacle goose and Orinoco goose selections lack consistent usable height, so viewing height is illustrative. Sparse fixes show the broad route; instantaneous speed may be unavailable.",
+    "Environment layers are hourly surface reanalysis estimates sampled at 1\u00b0; wind at bird flight altitude, turbulence and fine-scale weather are not measured.",
+    "Camera stabilization intentionally follows broader travel direction and may offset the camera by up to 150 m; it does not alter the GPS data or measure bird gaze.",
+    "Black kite selections show the Strait of Gibraltar migration bottleneck; taiga bean goose selections show moult migration. Not every journey represents a complete continental migration."
   ],
   "product_url_local": "http://127.0.0.1:4173/",
   "publication": "Published through GitHub Pages; future pushes to main test, build and deploy automatically.",

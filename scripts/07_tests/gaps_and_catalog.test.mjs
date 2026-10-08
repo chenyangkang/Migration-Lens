@@ -8,9 +8,9 @@ import {solarElevation} from '../01_shared_helpers/time_and_light.mjs';
 const catalog=JSON.parse(readFileSync(new URL('../../resources/configs/journey_catalog.json',import.meta.url)));
 const journeys=catalog.datasets.flatMap(file=>JSON.parse(readFileSync(new URL('../../'+file,import.meta.url))).journeys);
 
-test('all four species share a validated catalog with unique journey identities',()=>{
-  assert.equal(validateJourneys(journeys).length,13);
-  assert.equal(new Set(journeys.map(j=>j.species)).size,4);
+test('all twelve species share a validated catalog with unique journey identities',()=>{
+  assert.equal(validateJourneys(journeys).length,69);
+  assert.equal(new Set(journeys.map(j=>j.species)).size,12);
   assert.throws(()=>validateJourneys([...journeys,journeys[0]]),/unique/);
 });
 test('playback stops before a real gap, then can resume from the exact next recorded fix',()=>{
@@ -41,7 +41,7 @@ test('unreleased crane height remains unknown and segment speed remains an estim
   assert.equal(crane.recommendedMode,'overview');assert.equal(crane.points.length,74);
 });
 test('goose catalog retains genuine nighttime observations with measured GPS heights',()=>{
-  for(const journey of journeys.filter(j=>j.species.includes('goose'))){
+  for(const journey of journeys.filter(j=>j.sourceDoi==='https://doi.org/10.5066/P9VUN0Q9'&&!j.id.startsWith('greater_white_fronted_goose_')&&!j.id.startsWith('snow_goose_lsn_'))){
     assert.equal(journey.medianIntervalSeconds,900);
     assert.ok(journey.points.some(p=>solarElevation(p[0],p[1],p[2])<-6));
     assert.ok(journey.points.every(p=>Number.isFinite(p[3])&&p[4]===null));

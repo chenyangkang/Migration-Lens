@@ -34,7 +34,14 @@ def corridor_nodes(journey):
             previous = journey['points'][index-1]
             if point[0]-previous[0] <= journey['maxInterpolationGapSeconds']:
                 count = max(1, math.ceil(max(abs(point[1]-previous[1]), abs(point[2]-previous[2]))/.1))
-                locations += [spherical_location(previous,point,k/count) for k in range(1,count)]
+                arc = [(previous[1], previous[2])] + [spherical_location(previous,point,k/count) for k in range(1,count)] + locations
+                # Include every bounding cell: a short diagonal can cross two grid edges
+                # between samples and require a corner absent at both endpoints.
+                for a, b in zip(arc, arc[1:]):
+                    west, east = math.floor(min(a[0],b[0])), math.floor(max(a[0],b[0]))
+                    south, north = math.floor(min(a[1],b[1])), math.floor(max(a[1],b[1]))
+                    nodes.update((x,y) for x in range(west,east+2) for y in range(south,north+2))
+                locations += arc[1:-1]
         for lon, lat in locations:
             x, y = math.floor(lon), math.floor(lat)
             nodes.update((a, b) for a in [x, x+1] for b in [y, y+1])

@@ -1,6 +1,6 @@
 # Migration Lens
 
-An immersive web app for following real birds through migration. Open on a turkey vulture's September 2021 flight from Arizona through western Mexico. Rotate a first-person camera, follow the bird from behind, or inspect its route on a globe. Playback supports real time and accelerated forward/backward speeds, ten-minute recorded-time steps, civil flight-day selection, timeline seeking, local and UTC clocks, sunlight tied to the flight time, and a map of the complete journey. Choose a species, an individual bird, then a migration: the catalog now has 12 birds and 13 journeys, with three individuals per species. Wind, precipitation and temperature are independently selectable historical overlays. Jump notices can be switched off for uninterrupted playback. Nearby Street View opens in Google Maps where panorama coverage exists.
+An immersive web app for following real birds through migration. Open on a turkey vulture's September 2021 flight from Arizona through western Mexico. Rotate a first-person camera, follow the bird from behind, or inspect its route on a globe. Playback supports real time and accelerated forward/backward speeds, ten-minute recorded-time steps, civil flight-day selection, timeline seeking, local and UTC clocks, sunlight tied to the flight time, and a map of the complete journey. Choose a species, an individual bird, then a migration: the catalog has 68 birds and 69 journeys across 12 species. Camera stabilization is on by default for First person and Follow. Wind, precipitation and temperature are independently selectable historical overlays. Jump notices can be switched off for uninterrupted playback. Nearby Street View opens in Google Maps where panorama coverage exists.
 
 Live app: [Migration Lens](https://chenyangkang.github.io/Migration-Lens/). Source: [GitHub](https://github.com/chenyangkang/Migration-Lens).
 
@@ -20,14 +20,15 @@ The Python server is for local preview. `dist/` is a static deployable site and 
 ## Project layout
 
 - `scripts/00_setup/`: static build entry point.
-- `scripts/01_shared_helpers/`: spherical interpolation, playback, gap handling, historical local-time formatting and solar geometry.
+- `scripts/01_shared_helpers/`: spherical interpolation, stable camera movement, playback, gap handling, historical local-time formatting and solar geometry.
 - `scripts/02_web_app/`: interface, globe, terrain provider and route map.
 - `scripts/03_data_preparation/`: reproducible archive curation.
 - `scripts/04_multi_species/`: normalization of public goose and crane migrations.
 - `data/04_multi_species/`: additional species in the shared journey schema.
 - `scripts/05_individual_catalog/` and `data/05_individual_catalog/`: additional identified birds and migration years.
 - `scripts/06_environment/` and `data/06_environment/`: preparation and packaged hourly weather along the migration corridors.
-- `scripts/07_tests/`: meaningful playback and data validation tests.
+- `scripts/07_tests/`: meaningful playback, camera and data validation tests.
+- `scripts/08_diverse_migrations/` and `data/08_diverse_migrations/`: expanded public GPS migration selections and retained source event identifiers.
 - `data/03_data_preparation/`: curated observations and deployment metadata.
 - `figures/04_product/`: verified product screenshots.
 - `resources/`: provenance, reference material and configuration.
@@ -37,7 +38,7 @@ The Python server is for local preview. `dist/` is a static deployable site and 
 
 Source: Bildstein KL, Barber D, Bechard MJ, Graña Grilli M, Therrien J. 2021. Data from: Study “Vultures Acopian Center USA GPS” (2003–2021). Movebank Data Repository. https://doi.org/10.5441/001/1.f3qt46r2.
 
-The download contains 1,772,639 GPS records for several birds. Migration Lens packages three selections:
+The download contains 1,772,639 GPS records for several birds. The original preparation stages package three selections; the expanded stage adds four more birds:
 
 | Bird | Period | Retained fixes | Median interval | Recorded flight days |
 | --- | --- | ---: | ---: | ---: |
@@ -126,14 +127,22 @@ The GitHub Pages workflow tests and builds the static app before deployment. Set
 
 ## Individuals and migration years
 
-The same interface now groups 13 migrations by species and individual. Three genuine individuals are included for each species:
+The interface groups 69 journeys by 12 species and 68 individually identified birds. Each species has at least two birds; the Orinoco goose archive contains a tracked pair.
 
-| Species | Individuals | Migrations |
-| --- | --- | ---: |
-| Turkey vulture | Peter, Leo, Steve | 3 |
-| Greater white-fronted goose | gwf_171615.1, gwf_180937.1, gwf_171633.1 | 4 |
-| Snow goose | lsn_180789.1, lsn_171625.1, lsn_193468.2 | 3 |
-| Sandhill crane | 100845, 100843, 100854 | 3 |
+| Species | Birds | Example route |
+| --- | ---: | --- |
+| Turkey vulture | 7 | Canada / Arizona to Central and South America |
+| Greater white-fronted goose | 13 | Northeast Pacific, including five Tule individuals |
+| Snow goose | 5 | Alaska to the Pacific Northwest |
+| Sandhill crane | 5 | Bering coast to Mexico / the southwestern U.S. |
+| White stork | 3 | Portugal / Spain across the Sahara |
+| Black kite | 8 | Strait of Gibraltar migration crossings |
+| Orinoco goose | 2 | Manú, Peru to the Llanos de Moxos, Bolivia |
+| Barnacle goose | 7 | Ireland through Iceland to Greenland |
+| Taiga bean goose | 6 | Finland to Arctic moult grounds on Novaya Zemlya |
+| Brown pelican | 4 | Southeastern U.S. coast to Florida / Cuba |
+| Demoiselle crane | 4 | East Asia to India |
+| White-naped crane | 4 | Transbaikalia to eastern China |
 
 The white-fronted goose `gwf_171615.1` offers published spring bouts from both 2019 and 2021. Steve's 234 retained hourly fixes span Arizona through Central America to northern Colombia. The two additional cranes terminate in northern Mexico, rather than being labelled as U.S. destinations. All individual identifiers are retained from their archives; no birds are invented. See `resources/individual_catalog_manifest.json` for selections and provenance.
 
@@ -151,7 +160,7 @@ These are **hourly ERA5 reanalysis surface estimates**, supplied by the [Open-Me
 
 ERA5's native grid is 0.25°. This release downloads **1° corridor samples** bordering recorded fixes and short great-circle segments, including ocean cells, with elevation downscaling disabled. Point readings and nearby wind arrows interpolate between these samples; coloured cells and regional arrows show node values. This display sampling is coarser than the underlying model. It is suitable for regional context, not fine-scale flight aerodynamics, turbulence or causal inference. Weather does not modify the sunlight model or synthesize historical clouds. A light preview keeps weather at the original flight time; a GPS gap uses the held last-fix location without implying that the bird stayed there.
 
-Approximately 11 MB of prepared weather is bundled as one static JSON file per journey and loaded only when a layer is enabled. GitHub Pages serves these files with the app; visitors make **no weather API requests and need no weather key or login**. The browser keeps at most three decoded weather journeys cached. Public tracking data and weather provenance remain in the source repository.
+Approximately 70 MB of prepared weather is bundled as one static JSON file per journey and loaded only when a layer is enabled. GitHub Pages serves these files with the app; visitors make **no weather API requests and need no weather key or login**. The browser keeps at most three decoded weather journeys cached. Public tracking data and weather provenance remain in the source repository.
 
 Reproduce the weather, then build:
 
@@ -167,3 +176,36 @@ The preparation script respects short pauses between public requests and reuses 
 Use **−10m** and **+10m** beside Play to move backward or forward by ten minutes of recorded/interpolated flight time. Long GPS gaps do not consume that interval: the control skips to the appropriate recorded endpoint and spends the remaining time within valid segments. Thus a ten-minute step can change the calendar clock by much more than ten minutes. When jump notices are enabled, an explicit step briefly reports skipped gaps; disabling notices keeps these steps quiet. Playback keeps its current running/paused state unless it reaches its end in the selected direction.
 
 For continuous fast forward or rewind, choose **Forward** or **Backward** and a **Playback speed**, then Play. The same accelerated speeds work in either direction. Rewinding stops at the first fix, and reverse gap notices hold at the later fix before jumping to the earlier fix. The reconstructed camera keeps the original flight bearing while the recording runs backward; weather, local/UTC clocks and sunlight follow the selected historical time. Previous/next-day buttons remain available. Keyboard **[** and **]** step back or ahead; Space plays or pauses.
+
+
+## Camera stabilization
+
+**Stabilize camera** is on by default in First person and Follow and is remembered in the browser. Face forward uses the stabilized travel direction. Unchecking it shows adjacent-fix bearings for comparison. Route geometry, bird marker, GPS measurements and weather sampling retain their original positions.
+
+Direction uses a great-circle chord within the same uninterrupted GPS segment, looking ahead and behind by `clamp(2 × median interval, 300 s, 21600 s)`. The window can expand up to threefold when the net displacement is small relative to the travelled path. When displacement is under 80 m or path coherence stays below 0.25, the camera holds its prior heading. Circular angle smoothing has a 1.4-second response, a 1.2° deadband and a **28°/second wall-time turn limit**, independent of playback speed or direction. Sustained turns still change the view.
+
+Fine-resolution tracks (median interval ≤300 s) also use a five-sample weighted camera position with a maximum **150 m offset** from the interpolated track. Camera height changes are damped, with a terrain clearance floor. These are viewing adjustments, not replacements for GPS observations. All camera smoothing resets on a seek, journey change or recording-gap transition and never crosses a missing section. On Peter’s actual track, the broader target bearing reduces total absolute adjacent heading variation by about **84%**; this measures bearing variation, not a claim about the bird’s head movement.
+
+## Expanded archive sources
+
+The expanded stage adds 56 GPS selections with licensed redistribution and source-specific curation:
+
+- White stork: Acácio et al., [migration timing and destinations](https://doi.org/10.5441/001/1.137cn005), CC0. Original bursts are sampled using the first actual fix per 30-second bucket; fixes without usable reported flight height are excluded. Longer gaps between bursts remain visible.
+- Black kite: Santos et al., [sea-crossing performance at Gibraltar](https://doi.org/10.5441/001/1.r9g07dr8), CC0. The source has one-second fixes; the viewer retains fixes with reported height, typically at ten-second spacing. These are short migration-bottleneck segments.
+- Orinoco goose: Davenport et al., [East with the night](https://doi.org/10.5441/001/1.ct8sk835), CC0. Both members of the tracked pair are included. The male’s daily fixes are substantially sparser than the female’s, and most male intervals are treated as gaps. Height is unavailable.
+- Barnacle goose: Cabot, [Greenland spring migration](https://doi.org/10.5441/001/1.5d3f0664), CC0. Seven real individuals; hourly or two-hourly GPS. Inconsistent raw-height flags are not used for camera height.
+- Taiga bean goose: Piironen et al., [moult migration to Novaya Zemlya](https://doi.org/10.5441/001/1.22kk5126), CC0. Six birds, with early-summer travel and arrival selected. This is moult migration, rather than breeding migration; GPS heights reference the ellipsoid.
+- Brown pelican: Lamb et al., [annual-cycle movement of Eastern Brown Pelicans](https://doi.org/10.5441/001/1.715), CC0. Four autumn-to-winter selections. Sparse GPS supports broad-route viewing; the mostly missing and implausible altitude values are deliberately not used.
+- Demoiselle and white-naped cranes: Ilyashenko et al., [1000 Cranes, Transbaikalia](https://doi.org/10.5441/001/1.592), CC BY 4.0. Four birds of each species. Long missing sections remain explicit; sparse selections open in Route view.
+
+Four more Turkey vultures, twelve more Pacific goose bouts, and two Alaska-to-Texas crane legs use the original Movebank/USGS sources. Tule geese remain grouped within Greater white-fronted goose: a subspecies is not counted as another species. The newly selected Sandhill crane legs exclude the earlier Russia portion of their published tracks; they are not presented as complete migrations from Russia. Vulture daytime selections retain the original curation rules.
+
+`resources/configs/diverse_migrations.json` records download URLs and chosen UTC windows. `resources/diversity_manifest.json` records hashes, citations, licenses and curation. New Movebank selections retain an original event ID for every displayed fix. No synthetic birds or GPS fixes are added. Source heights in mean sea level and ellipsoid datums remain explicitly distinguished; no conversion to a common vertical datum is claimed.
+
+Reproduce this stage from the original source CSVs (downloads are cached outside the repository):
+
+```sh
+python3 scripts/08_diverse_migrations/prepare_diverse_migrations.py --source-dir /path/to/archive_cache --download --vultures /path/to/vultures.csv --geese /path/to/goose_migrationAltitude_nePacific_weiser.csv --cranes /path/to/sacr_locations.csv
+python3 scripts/06_environment/prepare_environment.py
+node scripts/00_setup/build.mjs
+```

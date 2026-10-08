@@ -2,6 +2,7 @@
   "datasets": [
     "data/03_data_preparation/journeys.json",
     "data/04_multi_species/journeys.json",
-    "data/05_individual_catalog/journeys.json"
+    "data/05_individual_catalog/journeys.json",
+    "data/08_diverse_migrations/journeys.json"
   ]
 }

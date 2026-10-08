@@ -7,11 +7,11 @@ import {sampleTrack,recordingGaps,advancePlayback} from '../01_shared_helpers/fl
 const catalog=JSON.parse(readFileSync(new URL('../../resources/configs/journey_catalog.json',import.meta.url)));
 const journeys=catalog.datasets.flatMap(file=>JSON.parse(readFileSync(new URL('../../'+file,import.meta.url))).journeys);
 
-test('each species offers three distinct, identified birds',()=>{
+test('every species offers multiple distinct, identified birds',()=>{
   for(const species of new Set(journeys.map(j=>j.species))){
-    assert.equal(individualsForSpecies(journeys,species).length,3);
+    assert.ok(individualsForSpecies(journeys,species).length>=2);
   }
-  assert.equal(journeys.length,13);
+  assert.equal(journeys.length,69);
 });
 test('one individual can select multiple actual migrations without mixing birds',()=>{
   const entries=migrationsForIndividual(journeys,'Greater white-fronted goose','gwf_171615.1');
@@ -50,9 +50,11 @@ test('packaged weather covers every recorded fix and short interpolated segment'
       const p=journey.points[i],value=sampleWeather(data,p[0],p[1],p[2]);
       assert.ok(value&&Number.isFinite(value.temperature)&&value.wind,`${journey.id} fix ${i} weather missing`);
       if(i&&p[0]-journey.points[i-1][0]<=journey.maxInterpolationGapSeconds){
-        const time=(p[0]+journey.points[i-1][0])/2,sample=sampleTrack(journey,time);
-        const interpolated=sampleWeather(data,time,sample.longitude,sample.latitude);
-        assert.ok(interpolated&&Number.isFinite(interpolated.temperature),`${journey.id} segment ${i} weather missing`);
+        for(const fraction of [.1,.25,.5,.75,.9]){
+          const previous=journey.points[i-1],time=previous[0]+(p[0]-previous[0])*fraction,sample=sampleTrack(journey,time);
+          const interpolated=sampleWeather(data,time,sample.longitude,sample.latitude);
+          assert.ok(interpolated&&Number.isFinite(interpolated.temperature)&&interpolated.wind,`${journey.id} segment ${i} at ${fraction} weather missing`);
+        }
       }
     }
   }

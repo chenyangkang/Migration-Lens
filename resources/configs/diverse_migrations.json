@@ -1,0 +1,490 @@
+{
+  "sources": [
+    {
+      "key": "white_stork",
+      "archiveItem": "967b7813-220e-4f60-8415-166d118ac8fa",
+      "sourceDoi": "https://doi.org/10.5441/001/1.137cn005",
+      "citation": "Ac\u00e1cio M, Catry I, Soriano-Redondo A, Silva JP, Atkinson PW, Franco AMA. 2023. Data from: Timing is critical: consequences of asynchronous migration for the performance and destination of a long-distance migrant. Movebank Data Repository. https://doi.org/10.5441/001/1.137cn005",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "studyId": "multiple",
+      "publication": "https://doi.org/10.1186/s40462-022-00328-3",
+      "publicationTitle": "Migration timing and destinations of white storks",
+      "species": "White stork",
+      "scientificName": "Ciconia ciconia",
+      "files": [
+        {
+          "file": "white_stork_White Stork Adults 2020_part.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/8c079ae0-2912-4f10-9e5f-f83105eed752/content"
+        },
+        {
+          "file": "white_stork_White Stork Juveniles 2020_part.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/08c2975b-6bb8-47b6-be71-77405e1a8b07/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "Carreira_O590",
+          "start": "2020-07-18",
+          "end": "2020-09-06",
+          "route": "Portugal to the Sahel",
+          "subtitle": "Across the Strait and the Sahara"
+        },
+        {
+          "individual": "Mina_1722_Vodka",
+          "start": "2020-08-09",
+          "end": "2020-08-31",
+          "route": "Portugal to Mali",
+          "subtitle": "A young stork\u2019s first autumn journey"
+        },
+        {
+          "individual": "Castro_1720_D. Ines",
+          "start": "2020-09-01",
+          "end": "2020-10-07",
+          "route": "Spain to Mali",
+          "subtitle": "South through the Sahara"
+        }
+      ],
+      "minSpacingSeconds": 30,
+      "maxGap": 1800,
+      "flightStyle": "SOARING MIGRANT",
+      "description": "Published autumn migration selection from Portugal or Spain to Africa. Dense GPS bursts are sampled in 30-second buckets using real fixes only; fixes without usable flight height are excluded. Longer intervals still occur between bursts.",
+      "heightFields": [
+        "height-above-msl",
+        "height-above-ellipsoid"
+      ],
+      "requireHeight": true
+    },
+    {
+      "key": "black_kite",
+      "archiveItem": "bc9f9f41-d979-4b47-af63-01d709d290b7",
+      "sourceDoi": "https://doi.org/10.5441/001/1.r9g07dr8",
+      "citation": "Santos CD, Silva JP, Mu\u00f1oz A, Onrubia A, Wikelski M. 2020. Data from: The gateway to Africa: what determines sea crossing performance of a migratory soaring bird at the strait of Gibraltar?. Movebank Data Repository. https://doi.org/10.5441/001/1.r9g07dr8",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "studyId": "1049826825",
+      "publication": "https://doi.org/10.1111/1365-2656.13201",
+      "publicationTitle": "Sea-crossing performance at the Strait of Gibraltar",
+      "species": "Black kite",
+      "scientificName": "Milvus migrans",
+      "files": [
+        {
+          "file": "black_kite_The gateway to Africa_ what determines sea crossing performance of a migratory soaring bird at the strait of Gibraltar.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/ab65c6b5-5a2e-49f0-b0ef-c1dc0efbed3e/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "1",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "3",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "11",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "15",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "19",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "66",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "67",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        },
+        {
+          "individual": "72",
+          "start": "2012-01-01",
+          "end": "2014-01-01",
+          "route": "Strait of Gibraltar crossing",
+          "subtitle": "From Europe to Africa"
+        }
+      ],
+      "maxGap": 60,
+      "flightStyle": "SOARING MIGRANT",
+      "description": "A detailed GPS recording of a migration sea crossing at Gibraltar. The archive has one-second positions; this viewer retains fixes with reported flight height, typically ten seconds apart. This is a short bottleneck segment of a longer seasonal migration.",
+      "heightFields": [
+        "height-above-msl"
+      ],
+      "requireHeight": true
+    },
+    {
+      "key": "orinoco_goose",
+      "archiveItem": "e6732313-55a4-49e5-aa30-40d4c6ffac4d",
+      "sourceDoi": "https://doi.org/10.5441/001/1.ct8sk835",
+      "citation": "Davenport LC, Nole I, Carlos N. 2012. Data from: East with the night\u2014longitudinal migration of the Orinoco Goose between Man\u00fa National Park, Peru and the Llanos de Moxos, Bolivia. Movebank Data Repository. https://doi.org/10.5441/001/1.ct8sk835",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "studyId": "6981683",
+      "publication": "https://doi.org/10.1371/journal.pone.0046886",
+      "publicationTitle": "Nocturnal migration of an Orinoco goose pair",
+      "species": "Orinoco goose",
+      "scientificName": "Neochen jubata",
+      "files": [
+        {
+          "file": "orinoco_goose_Orinoco Goose, Davenport, Peru and Bolivia.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/0d918bd5-748d-4e2b-9006-624118604b00/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "GBFemale1",
+          "start": "2010-11-20",
+          "end": "2010-12-25",
+          "route": "Peru to Bolivia",
+          "subtitle": "East with the night"
+        },
+        {
+          "individual": "GBMale1",
+          "start": "2010-11-20",
+          "end": "2010-12-25",
+          "route": "Peru to Bolivia",
+          "subtitle": "East with the night"
+        }
+      ],
+      "maxGap": 21600,
+      "flightStyle": "TROPICAL MIGRANT",
+      "description": "One of a tracked breeding pair migrating from Man\u00fa, Peru, to the Llanos de Moxos, Bolivia. The paper reports predominantly nocturnal major movements. Male fixes are much sparser than female fixes; missing intervals are skipped.",
+      "heightFields": []
+    },
+    {
+      "key": "barnacle_goose",
+      "archiveItem": "2769c15e-55f0-4f93-a651-2c5b5dd423e8",
+      "sourceDoi": "https://doi.org/10.5441/001/1.5d3f0664",
+      "citation": "Cabot D. 2014. Data from: Forecasting spring from afar? Timing of migration and predictability of phenology along different migration routes of an avian herbivore [Greenland data]. Movebank Data Repository. https://doi.org/10.5441/001/1.5d3f0664",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "studyId": "31987083",
+      "publication": "https://doi.org/10.1111/1365-2656.12281",
+      "publicationTitle": "Spring migration and the green wave",
+      "species": "Barnacle goose",
+      "scientificName": "Branta leucopsis",
+      "files": [
+        {
+          "file": "barnacle_goose_Migration timing in barnacle geese (Greenland) (data from Ko\u0308lzsch et al. and Shariatinajafabadi et al. 2014).csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/721751f9-dda5-44a1-9f36-bad42dc191fb/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "65698",
+          "start": "2009-04-15",
+          "end": "2009-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        },
+        {
+          "individual": "70563",
+          "start": "2010-04-15",
+          "end": "2010-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        },
+        {
+          "individual": "78199",
+          "start": "2010-04-15",
+          "end": "2010-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        },
+        {
+          "individual": "78207",
+          "start": "2008-04-15",
+          "end": "2008-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        },
+        {
+          "individual": "78208",
+          "start": "2008-04-15",
+          "end": "2008-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        },
+        {
+          "individual": "78209",
+          "start": "2008-04-15",
+          "end": "2008-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        },
+        {
+          "individual": "78210",
+          "start": "2008-04-15",
+          "end": "2008-06-01",
+          "route": "Ireland via Iceland to Greenland",
+          "subtitle": "Across the North Atlantic"
+        }
+      ],
+      "maxGap": 21600,
+      "flightStyle": "ARCTIC WATERFOWL",
+      "description": "Real spring GPS migration through Iceland to Greenland. Typical fixes are hourly or two-hourly. Non-numeric height flags and missing values are unavailable; camera height is illustrative.",
+      "heightFields": [],
+      "heightReason": "The raw height column contains non-numeric fix flags and does not provide a consistently usable flight-height series; all viewer heights are deliberately left unknown."
+    },
+    {
+      "key": "bean_goose",
+      "archiveItem": "cd62a27e-79b2-4d8e-92de-8c5643104bfd",
+      "sourceDoi": "https://doi.org/10.5441/001/1.22kk5126",
+      "citation": "Piironen A, Paasivaara A, Laaksonen T. 2021. Data from: Birds of three worlds: moult migration to high Arctic expands a boreal\u2011temperate flyway to a third biome. Movebank Data Repository. https://doi.org/10.5441/001/1.22kk5126",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "studyId": "1415844328",
+      "publication": "https://doi.org/10.1186/s40462-021-00284-4",
+      "publicationTitle": "Moult migration to the high Arctic",
+      "species": "Taiga bean goose",
+      "scientificName": "Anser fabalis",
+      "files": [
+        {
+          "file": "bean_goose_Moult migration of taiga bean geese to Novaya Zemlya.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/73f3b9a0-ac55-42b8-89d9-f08e996428df/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "X23",
+          "start": "2019-06-01",
+          "end": "2019-07-03",
+          "route": "Finland to Novaya Zemlya",
+          "subtitle": "North to the Arctic moult grounds"
+        },
+        {
+          "individual": "X26",
+          "start": "2019-06-01",
+          "end": "2019-07-03",
+          "route": "Finland to Novaya Zemlya",
+          "subtitle": "North to the Arctic moult grounds"
+        },
+        {
+          "individual": "X27",
+          "start": "2019-06-01",
+          "end": "2019-07-03",
+          "route": "Finland to Novaya Zemlya",
+          "subtitle": "North to the Arctic moult grounds"
+        },
+        {
+          "individual": "X32",
+          "start": "2019-06-01",
+          "end": "2019-07-03",
+          "route": "Finland to Novaya Zemlya",
+          "subtitle": "North to the Arctic moult grounds"
+        },
+        {
+          "individual": "X49",
+          "start": "2020-06-01",
+          "end": "2020-07-03",
+          "route": "Finland to Novaya Zemlya",
+          "subtitle": "North to the Arctic moult grounds"
+        },
+        {
+          "individual": "NC.salla",
+          "start": "2020-06-01",
+          "end": "2020-07-03",
+          "route": "Finland to Novaya Zemlya",
+          "subtitle": "North to the Arctic moult grounds"
+        }
+      ],
+      "maxGap": 7200,
+      "flightStyle": "ARCTIC MOULT MIGRANT",
+      "description": "Early-summer GPS selection spanning departure, travel and arrival on Arctic moult grounds. This is moult migration, rather than a breeding migration. Ten-minute fixes preserve long-distance travel and stopovers.",
+      "heightFields": [
+        "height-above-ellipsoid"
+      ]
+    },
+    {
+      "key": "brown_pelican",
+      "archiveItem": "b77c0250-c850-4e73-8f06-1c53ed195080",
+      "sourceDoi": "https://doi.org/10.5441/001/1.715",
+      "citation": "Lamb JS, Satg\u00e9 YG, Jodice PGR. 2026. Data from: Annual-cycle movement patterns of Eastern Brown Pelicans from the northern end of their breeding range. Movebank Data Repository. https://doi.org/10.5441/001/1.715",
+      "licence": "CC0 1.0 Universal",
+      "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "studyId": "2782529952",
+      "publication": "https://doi.org/10.1675/063.049.0103",
+      "publicationTitle": "Annual-cycle migration of Eastern Brown Pelicans",
+      "species": "Brown pelican",
+      "scientificName": "Pelecanus occidentalis",
+      "files": [
+        {
+          "file": "brown_pelican_Brown Pelican_Virginia.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/62e2f5fa-8b4e-410f-b5ca-c6e2d5c311f3/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "SS01",
+          "start": "2023-11-15",
+          "end": "2024-01-02",
+          "route": "Carolinas to the Florida Keys",
+          "subtitle": "South along the Atlantic coast"
+        },
+        {
+          "individual": "SS02",
+          "start": "2023-12-01",
+          "end": "2024-02-01",
+          "route": "North Carolina to Florida",
+          "subtitle": "A coastal winter journey"
+        },
+        {
+          "individual": "SS06",
+          "start": "2023-11-01",
+          "end": "2024-01-02",
+          "route": "Virginia to Georgia",
+          "subtitle": "Along the southeastern seaboard"
+        },
+        {
+          "individual": "SS07",
+          "start": "2023-10-20",
+          "end": "2024-01-02",
+          "route": "Virginia to Cuba",
+          "subtitle": "From Chesapeake waters to the Caribbean"
+        }
+      ],
+      "maxGap": 21600,
+      "flightStyle": "COASTAL MIGRANT",
+      "description": "Published autumn-to-winter GPS selection from the Eastern Brown Pelican study. Fixes are roughly 90 minutes apart with long gaps; this opens in Route view. The altitude column is mostly missing and contains implausible values, so viewing height is illustrative.",
+      "heightFields": [],
+      "heightReason": "Published height values are overwhelmingly missing; the few supplied values include implausible heights around 90 km. No altitude values are used in the viewer."
+    },
+    {
+      "key": "asian_cranes",
+      "archiveItem": "fd78ade4-cedd-459c-b151-fac2ca2f65a1",
+      "sourceDoi": "https://doi.org/10.5441/001/1.592",
+      "citation": "Ilyashenko EI, Pokrovsky I, Goroshko OA, Mudrik EA, Politov D, Ilyashenko VY, Fiedler W, Wikelski M. 2024. Data from: Study \"1000 Cranes. Russia. Transbaikalia.\". Movebank Data Repository. https://doi.org/10.5441/001/1.592",
+      "licence": "Attribution 4.0 International",
+      "licenceUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "studyId": "497091077",
+      "publication": "https://doi.org/10.1073/pnas.2316827121",
+      "publicationTitle": "Seasonal movement and niches of Asian cranes",
+      "species": "Demoiselle crane",
+      "scientificName": "Anthropoides virgo",
+      "files": [
+        {
+          "file": "asian_cranes_1000 Cranes. Russia. Transbaikalia.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/ac6bd247-be0e-4897-924f-35eea89dccac/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "CraneB2_AV_KN6111",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "East Asia to India",
+          "subtitle": "Across Asia to the wintering grounds"
+        },
+        {
+          "individual": "CraneT0_AV_KN6112",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "East Asia to India",
+          "subtitle": "Across Asia to the wintering grounds"
+        },
+        {
+          "individual": "CraneT7_AV_KN6110",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "East Asia to India",
+          "subtitle": "Across Asia to the wintering grounds"
+        },
+        {
+          "individual": "CraneT8_AV_KN6116",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "East Asia to India",
+          "subtitle": "Across Asia to the wintering grounds"
+        }
+      ],
+      "maxGap": 21600,
+      "flightStyle": "MIGRATORY WATERBIRD",
+      "description": "A real autumn GPS migration selection from the 1000 Cranes project. Some long portions were not recorded in the public release. Dashed links indicate missing data; sparse tracks open in Route view.",
+      "heightFields": [
+        "height-above-ellipsoid"
+      ]
+    },
+    {
+      "key": "asian_cranes",
+      "archiveItem": "fd78ade4-cedd-459c-b151-fac2ca2f65a1",
+      "sourceDoi": "https://doi.org/10.5441/001/1.592",
+      "citation": "Ilyashenko EI, Pokrovsky I, Goroshko OA, Mudrik EA, Politov D, Ilyashenko VY, Fiedler W, Wikelski M. 2024. Data from: Study \"1000 Cranes. Russia. Transbaikalia.\". Movebank Data Repository. https://doi.org/10.5441/001/1.592",
+      "licence": "Attribution 4.0 International",
+      "licenceUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "studyId": "497091077",
+      "publication": "https://doi.org/10.1073/pnas.2316827121",
+      "publicationTitle": "Seasonal movement and niches of Asian cranes",
+      "species": "White-naped crane",
+      "scientificName": "Grus vipio",
+      "files": [
+        {
+          "file": "asian_cranes_1000 Cranes. Russia. Transbaikalia.csv",
+          "url": "https://datarepository.movebank.org/server/api/core/bitstreams/ac6bd247-be0e-4897-924f-35eea89dccac/content"
+        }
+      ],
+      "choices": [
+        {
+          "individual": "GV_Green_KN6148",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "Transbaikalia to eastern China",
+          "subtitle": "Across Asia to the wintering grounds"
+        },
+        {
+          "individual": "GV_Kulusutai_KN6149",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "Transbaikalia to eastern China",
+          "subtitle": "Across Asia to the wintering grounds"
+        },
+        {
+          "individual": "GV_Onon_KN6150",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "Transbaikalia to eastern China",
+          "subtitle": "Across Asia to the wintering grounds"
+        },
+        {
+          "individual": "GV_Torey_KN6168",
+          "start": "2018-09-15",
+          "end": "2018-11-21",
+          "route": "Transbaikalia to eastern China",
+          "subtitle": "Across Asia to the wintering grounds"
+        }
+      ],
+      "maxGap": 21600,
+      "flightStyle": "MIGRATORY WATERBIRD",
+      "description": "A real autumn GPS migration selection from the 1000 Cranes project. Some long portions were not recorded in the public release. Dashed links indicate missing data; sparse tracks open in Route view.",
+      "heightFields": [
+        "height-above-ellipsoid"
+      ]
+    }
+  ]
+}
