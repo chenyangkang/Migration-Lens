@@ -51,15 +51,26 @@ export function recordingGaps(journey) {
   });
 }
 
-export function advancePlayback(journey,currentTime,elapsedSeconds,multiplier,{stopAtGap=false}={}) {
-  const points=journey.points,end=points.at(-1)[0];
+export function advancePlayback(journey,currentTime,elapsedSeconds,multiplier,{stopAtGap=false,direction=1}={}) {
+  const points=journey.points,start=points[0][0],end=points.at(-1)[0];
+  if(direction===-1){
+    let target=Math.max(start,currentTime-elapsedSeconds*multiplier),skipped=false;
+    for(let i=locateInterval(points,currentTime);i>=0&&points[i+1][0]>=target;i--){
+      const a=points[i],b=points[i+1];
+      if(b[0]-a[0]>journey.maxInterpolationGapSeconds&&target<b[0]&&currentTime>a[0]){
+        if(stopAtGap)return {time:Math.min(b[0],currentTime),skipped:false,ended:false,gap:{start:a[0],end:b[0],duration:b[0]-a[0],fromIndex:i,toIndex:i+1}};
+        target=Math.max(start,a[0]-Math.max(0,Math.min(currentTime,b[0])-target));skipped=true;
+      }
+    }
+    return {time:target,skipped,ended:target<=start};
+  }
   let target=Math.min(end,currentTime+elapsedSeconds*multiplier),skipped=false;
   // Never fly invented paths across missing data or overnight gaps.
   for(let i=locateInterval(points,currentTime);i<points.length-1&&points[i][0]<=target;i++){
     const a=points[i],b=points[i+1];
     if(b[0]-a[0]>journey.maxInterpolationGapSeconds&&target>a[0]&&currentTime<b[0]){
       if(stopAtGap)return {time:Math.max(a[0],currentTime),skipped:false,ended:false,gap:{start:a[0],end:b[0],duration:b[0]-a[0],fromIndex:i,toIndex:i+1}};
-      target=Math.min(end,b[0]+Math.max(0,target-a[0]));skipped=true;
+      target=Math.min(end,b[0]+Math.max(0,target-Math.max(currentTime,a[0])));skipped=true;
     }
   }
   return {time:target,skipped,ended:target>=end};

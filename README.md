@@ -1,6 +1,6 @@
 # Migration Lens
 
-An immersive web app for following real birds through migration. Open on a turkey vulture's September 2021 flight from Arizona through western Mexico. Rotate a first-person camera, follow the bird from behind, or inspect its route on a globe. Playback supports real time and accelerated speeds, civil flight-day selection, timeline seeking, local and UTC clocks, sunlight tied to the flight time, and a map of the complete journey. Choose a species, an individual bird, then a migration: the catalog now has 12 birds and 13 journeys, with three individuals per species. Wind, precipitation and temperature are independently selectable historical overlays. Jump notices can be switched off for uninterrupted playback. Nearby Street View opens in Google Maps where panorama coverage exists.
+An immersive web app for following real birds through migration. Open on a turkey vulture's September 2021 flight from Arizona through western Mexico. Rotate a first-person camera, follow the bird from behind, or inspect its route on a globe. Playback supports real time and accelerated forward/backward speeds, ten-minute recorded-time steps, civil flight-day selection, timeline seeking, local and UTC clocks, sunlight tied to the flight time, and a map of the complete journey. Choose a species, an individual bird, then a migration: the catalog now has 12 birds and 13 journeys, with three individuals per species. Wind, precipitation and temperature are independently selectable historical overlays. Jump notices can be switched off for uninterrupted playback. Nearby Street View opens in Google Maps where panorama coverage exists.
 
 Live app: [Migration Lens](https://chenyangkang.github.io/Migration-Lens/). Source: [GitHub](https://github.com/chenyangkang/Migration-Lens).
 
@@ -161,3 +161,9 @@ node scripts/00_setup/build.mjs
 ```
 
 The preparation script respects short pauses between public requests and reuses downloaded results. Use Open-Meteo's [API terms and limits](https://open-meteo.com/en/terms) when rebuilding; the free endpoint is for noncommercial use. `resources/environment_manifest.json` contains variable definitions, exact requests, native/display resolution and per-file hashes. The existing GitHub Actions workflow publishes the complete static app after passing the tests.
+
+## Fast forward and rewind
+
+Use **−10m** and **+10m** beside Play to move backward or forward by ten minutes of recorded/interpolated flight time. Long GPS gaps do not consume that interval: the control skips to the appropriate recorded endpoint and spends the remaining time within valid segments. Thus a ten-minute step can change the calendar clock by much more than ten minutes. When jump notices are enabled, an explicit step briefly reports skipped gaps; disabling notices keeps these steps quiet. Playback keeps its current running/paused state unless it reaches its end in the selected direction.
+
+For continuous fast forward or rewind, choose **Forward** or **Backward** and a **Playback speed**, then Play. The same accelerated speeds work in either direction. Rewinding stops at the first fix, and reverse gap notices hold at the later fix before jumping to the earlier fix. The reconstructed camera keeps the original flight bearing while the recording runs backward; weather, local/UTC clocks and sunlight follow the selected historical time. Previous/next-day buttons remain available. Keyboard **[** and **]** step back or ahead; Space plays or pauses.

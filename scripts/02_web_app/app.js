@@ -7,8 +7,8 @@ import {individualsForSpecies,migrationsForIndividual} from './individual_catalo
 import {timeZoneAt,formatFlightTime,solarElevation,lightPhase} from './time_and_light.mjs';
 
 const $=id=>document.getElementById(id);
-const ui=Object.fromEntries(['individualSelect','jumpNoticesToggle','windToggle','precipitationToggle','temperatureToggle','weatherCard','weatherStatus','weatherReadings','weatherLegend','weatherCaption','mapHeading','loading','viewerError','viewerErrorText','speciesSelect','sourceBadge','flightStyle','resolutionNote','speedMetricLabel','gapCard','gapTitle','gapFrom','gapTo','gapExplanation','gapNightNote','gapCountdown','gapsButton','gapsDialog','gapsSummary','gapList','journeySelect','flightHeading','flightLocation','birdName','birdScientific','journeySummary','totalDistance','totalDuration','fixCount','fixInterval','flightDays','dayCount','currentDate','currentTime','timeBasis','timeContext','lightingButton','lightPhase','lightPreviewButton','lightPreviewPanel','lightPreviewTime','lightPreviewDate','lightPreviewPlayButton','lightPreviewTimeline','altitudeValue','speedValue','distanceValue','headingValue','compassNeedle','timeline','startLabel','endLabel','sampleStatus','mapProgress','altitudeChart','playButton','playLabel','playIcon','lookHint','terrainStatus','notice','sourcesDialog','sourceDetails'].map(id=>[id,$(id)]));
-const state={journeys:[],journey:null,time:0,playing:false,multiplier:60,mode:'first',lookYaw:0,lookPitch:0,frameTime:0,lastUi:0,lastNotice:0,currentDay:-1,overviewReady:false,cameraHeading:null,fov:67,timeBasis:'local',lighting:true,lightPreview:null,pendingGap:null,gaps:[],jumpNotices:true,environmentLayers:[]};
+const ui=Object.fromEntries(['rewindButton','fastForwardButton','directionSelect','individualSelect','jumpNoticesToggle','windToggle','precipitationToggle','temperatureToggle','weatherCard','weatherStatus','weatherReadings','weatherLegend','weatherCaption','mapHeading','loading','viewerError','viewerErrorText','speciesSelect','sourceBadge','flightStyle','resolutionNote','speedMetricLabel','gapCard','gapTitle','gapFrom','gapTo','gapExplanation','gapNightNote','gapCountdown','gapsButton','gapsDialog','gapsSummary','gapList','journeySelect','flightHeading','flightLocation','birdName','birdScientific','journeySummary','totalDistance','totalDuration','fixCount','fixInterval','flightDays','dayCount','currentDate','currentTime','timeBasis','timeContext','lightingButton','lightPhase','lightPreviewButton','lightPreviewPanel','lightPreviewTime','lightPreviewDate','lightPreviewPlayButton','lightPreviewTimeline','altitudeValue','speedValue','distanceValue','headingValue','compassNeedle','timeline','startLabel','endLabel','sampleStatus','mapProgress','altitudeChart','playButton','playLabel','playIcon','lookHint','terrainStatus','notice','sourcesDialog','sourceDetails'].map(id=>[id,$(id)]));
+const state={journeys:[],journey:null,time:0,playing:false,multiplier:60,direction:1,mode:'first',lookYaw:0,lookPitch:0,frameTime:0,lastUi:0,lastNotice:0,currentDay:-1,overviewReady:false,cameraHeading:null,fov:67,timeBasis:'local',lighting:true,lightPreview:null,pendingGap:null,gaps:[],jumpNotices:true,environmentLayers:[]};
 let viewer,C,marker,map,environment,routeEntities=[];
 function savePreferences(){try{localStorage.setItem('migrationLensPreferences',JSON.stringify({jumpNotices:state.jumpNotices,environmentLayers:state.environmentLayers}));}catch{}}
 function restorePreferences(){try{const saved=JSON.parse(localStorage.getItem('migrationLensPreferences')??'{}');state.jumpNotices=saved.jumpNotices!==false;state.environmentLayers=Array.isArray(saved.environmentLayers)?saved.environmentLayers.filter(layer=>['wind','precipitation','temperature'].includes(layer)):[];}catch{}}
@@ -16,12 +16,40 @@ const dateShort=new Intl.DateTimeFormat('en',{month:'short',day:'numeric',timeZo
 const number=new Intl.NumberFormat('en',{maximumFractionDigits:0});
 
 function notice(message){ui.notice.textContent=message;ui.notice.hidden=false;state.lastNotice=performance.now();}
-function setPlaying(value){state.playing=value;ui.playLabel.textContent=value?'Pause flight':'Play flight';ui.playButton.setAttribute('aria-label',value?'Pause migration':'Play migration');ui.playIcon.innerHTML=value?'<path d="M7 5h3v14H7zM14 5h3v14h-3z"/>':'<path d="M9 5l10 7-10 7z"/>';}
+function setPlaying(value){
+  state.playing=value;const backward=state.direction===-1;
+  ui.playLabel.textContent=value?(backward?'Pause rewind':'Pause flight'):(backward?'Rewind flight':'Play flight');
+  ui.playButton.setAttribute('aria-label',value?'Pause migration':(backward?'Play migration backward':'Play migration'));
+  ui.playIcon.innerHTML=value?'<path d="M7 5h3v14H7zM14 5h3v14h-3z"/>':(backward?'<path d="M15 5L5 12l10 7z"/>':'<path d="M9 5l10 7-10 7z"/>');
+}
+function setPlaybackDirection(direction){
+  state.direction=direction;ui.directionSelect.value=String(direction);clearGap();setPlaying(state.playing);
+}
+function togglePlayback(){
+  stopLightPreview();
+  const points=state.journey.points;
+  if(!state.playing&&state.direction===1&&state.time>=points.at(-1)[0])state.time=points[0][0];
+  if(!state.playing&&state.direction===-1&&state.time<=points[0][0])state.time=points.at(-1)[0];
+  setPlaying(!state.playing);
+}
+function stepPlayback(direction){
+  stopLightPreview();clearGap();const previous=state.time;
+  const result=advancePlayback(state.journey,state.time,600,1,{direction});
+  state.time=result.time;state.cameraHeading=null;
+  if(state.playing&&(state.direction===1?state.time>=state.journey.points.at(-1)[0]:state.time<=state.journey.points[0][0]))setPlaying(false);
+  if(result.skipped&&state.jumpNotices){
+    const gaps=state.gaps.filter(gap=>gap.start<Math.max(previous,state.time)&&gap.end>Math.min(previous,state.time));
+    const duration=gaps.reduce((sum,gap)=>sum+gap.duration,0);
+    notice(`Skipped ${gaps.length} GPS ${gaps.length===1?'gap':'gaps'} while moving ${direction===1?'ahead':'back'} · ${formatDuration(duration)} without displayed positions`);
+  }
+  updateUi(true);updateCamera(1);
+}
+
 function failure(message){ui.loading.hidden=true;ui.viewerError.hidden=false;ui.viewerErrorText.textContent=message;setPlaying(false);}
 
 function clearGap(){state.pendingGap=null;ui.gapCard.hidden=true;}
 function showGap(gap){
-  state.pendingGap={...gap,remaining:3};ui.gapCard.hidden=false;updateGapCard();
+  state.pendingGap={...gap,remaining:3,direction:state.direction};ui.gapCard.hidden=false;updateGapCard();
 }
 function updateGapCard(){
   if(!state.pendingGap)return;
@@ -29,17 +57,17 @@ function updateGapCard(){
   ui.gapTitle.textContent=`No displayed GPS fixes for ${details.duration}`;
   ui.gapFrom.textContent=details.from;ui.gapTo.textContent=details.to;
   ui.gapExplanation.textContent=details.explanation;ui.gapNightNote.textContent=details.nightNote;
-  ui.gapCountdown.textContent=state.playing?`Jump in ${Math.ceil(state.pendingGap.remaining)}s`:'Position held · playback paused';
-  $('pauseGapButton').hidden=!state.playing;
+  ui.gapCountdown.textContent=state.playing?`Jump ${state.pendingGap.direction===-1?'back ':''}in ${Math.ceil(state.pendingGap.remaining)}s`:'Position held · playback paused';
+  $('pauseGapButton').hidden=!state.playing;$('skipGapButton').textContent=state.pendingGap.direction===-1?'Jump to previous fix':'Jump to next fix';
 }
 function finishGap(){
   if(!state.pendingGap)return;
-  const duration=formatDuration(state.pendingGap.duration);state.time=state.pendingGap.end;clearGap();state.cameraHeading=null;
-  if(state.jumpNotices)notice(`Jumped to the next GPS fix · ${duration} without displayed positions`);updateUi(true);updateCamera(1);
+  const duration=formatDuration(state.pendingGap.duration),backward=state.pendingGap.direction===-1;state.time=backward?state.pendingGap.start:state.pendingGap.end;clearGap();state.cameraHeading=null;
+  if(state.jumpNotices)notice(`Jumped to the ${backward?'previous':'next'} GPS fix · ${duration} without displayed positions`);updateUi(true);updateCamera(1);
 }
 function inspectGap(index){
   const gap=state.gaps[index];if(!gap)return;
-  stopLightPreview();setPlaying(false);state.time=gap.start;state.cameraHeading=null;showGap(gap);updateUi(true);updateCamera(1);
+  stopLightPreview();setPlaying(false);state.time=state.direction===-1?gap.end:gap.start;state.cameraHeading=null;showGap(gap);updateUi(true);updateCamera(1);
 }
 function gapInside(time){return state.gaps.find(gap=>time>gap.start&&time<gap.end);}
 function renderGapList(){
@@ -221,6 +249,7 @@ function updateUi(force=false){
   ui.headingValue.textContent=`${number.format(sample.heading)}°`;ui.compassNeedle.style.transform=`rotate(${normalizeHeading(sample.heading+state.lookYaw)}deg)`;
   ui.timeline.value=Math.round((sample.time-j.points[0][0])/(j.points.at(-1)[0]-j.points[0][0])*1000);
   ui.sampleStatus.textContent=missing?`No GPS fixes · position held · ${formatDuration(sample.interval)} gap`:`${(sample.fraction<.01||sample.fraction>.99)?'Recorded GPS fix':'Between GPS fixes'} · ${formatDuration(sample.interval)} spacing${sample.altitude==null?' · viewing height illustrative':' · * approximate GPS height'}`;
+  ui.rewindButton.disabled=state.time<=j.points[0][0];ui.fastForwardButton.disabled=state.time>=j.points.at(-1)[0];
   updateGapCard();
   $('streetViewLink').href=`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${sample.latitude.toFixed(5)},${sample.longitude.toFixed(5)}`;
   ui.mapProgress.textContent=`${Math.round(sample.distance/j.totalDistanceKm*100)}% of observed route`;
@@ -275,7 +304,7 @@ function animationFrame(now){
   if(state.lightPreview?.playing){state.lightPreview.minutes+=dt*30;if(state.lightPreview.minutes>=1440){state.lightPreview.minutes=1440;setLightPreviewPlaying(false);}updateLighting();}
   if(state.playing){
     if(state.pendingGap){state.pendingGap.remaining-=dt;if(state.pendingGap.remaining<=0)finishGap();}
-    else{const result=advancePlayback(state.journey,state.time,dt,state.multiplier,{stopAtGap:state.jumpNotices});state.time=result.time;if(result.gap)showGap(result.gap);if(result.ended)setPlaying(false);}
+    else{const result=advancePlayback(state.journey,state.time,dt,state.multiplier,{stopAtGap:state.jumpNotices,direction:state.direction});state.time=result.time;if(result.gap)showGap(result.gap);if(result.ended)setPlaying(false);}
   }
   if(viewer&&state.journey&&state.mode!=='overview'&&(state.playing||now-state.lastUi>180))updateCamera(dt);
   if(now-state.lastUi>180){updateUi();state.lastUi=now;}
@@ -294,7 +323,9 @@ function bindControls(){
   $('skipGapButton').addEventListener('click',finishGap);$('pauseGapButton').addEventListener('click',()=>{setPlaying(false);updateGapCard();});
   ui.gapsButton.addEventListener('click',()=>{setPlaying(false);renderGapList();ui.gapsDialog.showModal();});$('closeGapsButton').addEventListener('click',()=>ui.gapsDialog.close());
   ui.journeySelect.addEventListener('change',event=>chooseJourney(event.target.value));
-  ui.playButton.addEventListener('click',()=>{stopLightPreview();if(state.time>=state.journey.points.at(-1)[0])state.time=state.journey.points[0][0];setPlaying(!state.playing);});
+  ui.playButton.addEventListener('click',togglePlayback);
+  ui.rewindButton.addEventListener('click',()=>stepPlayback(-1));ui.fastForwardButton.addEventListener('click',()=>stepPlayback(1));
+  ui.directionSelect.addEventListener('change',event=>setPlaybackDirection(Number(event.target.value)));
   $('previousDayButton').addEventListener('click',()=>seekDay(activeDay()-1));$('nextDayButton').addEventListener('click',()=>seekDay(activeDay()+1));
   $('speedSelect').addEventListener('change',event=>state.multiplier=Number(event.target.value));
   ui.timeline.addEventListener('input',event=>{stopLightPreview();clearGap();const p=state.journey.points;state.time=p[0][0]+Number(event.target.value)/1000*(p.at(-1)[0]-p[0][0]);state.cameraHeading=null;const gap=gapInside(state.time);if(gap&&state.jumpNotices)showGap(gap);updateUi(true);updateCamera(1);});
@@ -309,7 +340,7 @@ function bindControls(){
   ui.sourcesDialog.addEventListener('click',event=>{if(event.target===ui.sourcesDialog){const r=ui.sourcesDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)ui.sourcesDialog.close();}});
   $('retryButton').addEventListener('click',()=>location.reload());
   $('fullscreenButton').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('app').requestFullscreen();}catch{notice('Fullscreen is unavailable in this browser.');}});
-  document.addEventListener('keydown',event=>{if(!state.journey||ui.sourcesDialog.open||ui.gapsDialog.open||['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target.tagName))return;if(event.code==='Space'){event.preventDefault();stopLightPreview();setPlaying(!state.playing);}else if(['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();state.lookYaw+=event.key==='ArrowLeft'?-8:8;}else if(['ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();state.lookPitch=clamp(state.lookPitch+(event.key==='ArrowUp'?5:-5),-65,85);}else if(event.key.toLowerCase()==='r'){state.lookYaw=0;state.lookPitch=0;}});
+  document.addEventListener('keydown',event=>{if(!state.journey||ui.sourcesDialog.open||ui.gapsDialog.open||['INPUT','SELECT','TEXTAREA','BUTTON'].includes(event.target.tagName))return;if(event.code==='Space'){event.preventDefault();togglePlayback();}else if(event.key==='['||event.key===']'){event.preventDefault();stepPlayback(event.key==='['?-1:1);}else if(['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();state.lookYaw+=event.key==='ArrowLeft'?-8:8;}else if(['ArrowUp','ArrowDown'].includes(event.key)){event.preventDefault();state.lookPitch=clamp(state.lookPitch+(event.key==='ArrowUp'?5:-5),-65,85);}else if(event.key.toLowerCase()==='r'){state.lookYaw=0;state.lookPitch=0;}});
   const canvas=viewer.scene.canvas;let dragging=false,lastX=0,lastY=0;
   canvas.addEventListener('pointerdown',event=>{if(state.mode==='overview')return;dragging=true;lastX=event.clientX;lastY=event.clientY;canvas.setPointerCapture(event.pointerId);canvas.style.cursor='grabbing';});
   canvas.addEventListener('pointermove',event=>{if(!dragging)return;state.lookYaw-=(event.clientX-lastX)*.22;state.lookPitch=clamp(state.lookPitch+(event.clientY-lastY)*.18,-65,85);lastX=event.clientX;lastY=event.clientY;updateCamera(.2);});
@@ -323,16 +354,18 @@ async function registerTools(){
   if(!context?.registerTool)return;
   const lifecycle=new AbortController();
   window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
-  await context.registerTool({name:'configure_migration_playback',title:'Configure migration playback',description:'Select a tracked migration, flight day, camera, local/UTC clock, surface weather overlays, jump notices and flight-time/daylight lighting. Preview 24 hours of sunlight at a held track position without changing bird movement. Changes the visible viewer only.',inputSchema:{type:'object',properties:{journey:{type:'string',enum:state.journeys.map(j=>j.id)},day:{type:'integer',minimum:1},gap:{type:'integer',minimum:1,description:'Inspect a numbered recording gap; holds at its last fix.'},camera:{type:'string',enum:['first','follow','overview']},playing:{type:'boolean'},clock:{type:'string',enum:['local','utc']},lighting:{type:'string',enum:['flight','daylight']},lightPreviewMinutes:{type:'number',minimum:0,maximum:1440},lightPreviewPlaying:{type:'boolean'},jumpNotices:{type:'boolean'},environment:{type:'array',items:{type:'string',enum:['wind','precipitation','temperature']},uniqueItems:true}},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async(input)=>{
+  await context.registerTool({name:'configure_migration_playback',title:'Configure migration playback',description:'Select a tracked migration, flight day, forward/backward playback or a ten-minute step, camera, local/UTC clock, surface weather overlays, jump notices and flight-time/daylight lighting. Preview 24 hours of sunlight at a held track position without changing bird movement. Changes the visible viewer only.',inputSchema:{type:'object',properties:{journey:{type:'string',enum:state.journeys.map(j=>j.id)},day:{type:'integer',minimum:1},gap:{type:'integer',minimum:1,description:'Inspect a numbered recording gap; holds at the entry fix in the selected playback direction.'},camera:{type:'string',enum:['first','follow','overview']},playing:{type:'boolean'},direction:{type:'string',enum:['forward','backward']},stepMinutes:{type:'number',enum:[-10,10],description:'Step by ten recorded minutes; skips gaps in the chosen direction.'},clock:{type:'string',enum:['local','utc']},lighting:{type:'string',enum:['flight','daylight']},lightPreviewMinutes:{type:'number',minimum:0,maximum:1440},lightPreviewPlaying:{type:'boolean'},jumpNotices:{type:'boolean'},environment:{type:'array',items:{type:'string',enum:['wind','precipitation','temperature']},uniqueItems:true}},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async(input)=>{
     if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Expected playback options.');
-    const {journey,day,gap,camera,playing,clock,lighting,lightPreviewMinutes,lightPreviewPlaying,jumpNotices,environment:layers}=input;
-    if(Object.keys(input).some(key=>!['journey','day','gap','camera','playing','clock','lighting','lightPreviewMinutes','lightPreviewPlaying','jumpNotices','environment'].includes(key)))throw new Error('Unknown playback option.');
+    const {journey,day,gap,camera,playing,direction,stepMinutes,clock,lighting,lightPreviewMinutes,lightPreviewPlaying,jumpNotices,environment:layers}=input;
+    if(Object.keys(input).some(key=>!['journey','day','gap','camera','playing','direction','stepMinutes','clock','lighting','lightPreviewMinutes','lightPreviewPlaying','jumpNotices','environment'].includes(key)))throw new Error('Unknown playback option.');
     const selected=journey===undefined?state.journey:state.journeys.find(j=>j.id===journey);
     if(!selected)throw new Error('Unknown journey.');
     if(day!==undefined&&(!Number.isInteger(day)||day<1||day>selected.days.length))throw new Error('Flight day is outside the recorded journey.');
     if(gap!==undefined&&(!Number.isInteger(gap)||gap<1||gap>recordingGaps(selected).length||day!==undefined))throw new Error('Select a valid recording gap without a flight day.');
     if(camera!==undefined&&!['first','follow','overview'].includes(camera))throw new Error('Unknown camera view.');
     if(playing!==undefined&&typeof playing!=='boolean')throw new Error('Playing must be true or false.');
+    if(direction!==undefined&&!['forward','backward'].includes(direction))throw new Error('Unknown playback direction.');
+    if(stepMinutes!==undefined&&(![-10,10].includes(stepMinutes)||gap!==undefined))throw new Error('Select a ten-minute step without a recording-gap inspection.');
     if(clock!==undefined&&!['local','utc'].includes(clock))throw new Error('Unknown clock basis.');
     if(lighting!==undefined&&!['flight','daylight'].includes(lighting))throw new Error('Unknown lighting mode.');
     if(lightPreviewMinutes!==undefined&&(!Number.isFinite(lightPreviewMinutes)||lightPreviewMinutes<0||lightPreviewMinutes>1440))throw new Error('Lighting preview must be between 0 and 1440 minutes.');
@@ -340,8 +373,8 @@ async function registerTools(){
     if(jumpNotices!==undefined&&typeof jumpNotices!=='boolean')throw new Error('Jump notices must be true or false.');
     if(layers!==undefined&&(!Array.isArray(layers)||layers.some(layer=>!['wind','precipitation','temperature'].includes(layer))||new Set(layers).size!==layers.length))throw new Error('Select valid environment layers.');
     const previewRequested=lightPreviewMinutes!==undefined||lightPreviewPlaying!==undefined;
-    if(previewRequested&&(playing===true||lighting==='daylight'))throw new Error('Lighting preview holds position and requires day/night lighting.');
-    if(journey!==undefined)chooseJourney(journey);if(day!==undefined)seekDay(day-1);if(gap!==undefined)inspectGap(gap-1);if(camera)setMode(camera);
+    if(previewRequested&&(playing===true||lighting==='daylight'||stepMinutes!==undefined))throw new Error('Lighting preview holds position and requires day/night lighting.');
+    if(journey!==undefined)chooseJourney(journey);if(direction)setPlaybackDirection(direction==='backward'?-1:1);if(day!==undefined)seekDay(day-1);if(gap!==undefined)inspectGap(gap-1);if(camera)setMode(camera);
     if(clock){state.timeBasis=clock;ui.timeBasis.value=clock;}
     if(lighting){stopLightPreview();setLighting(lighting==='flight');}
     if(typeof playing==='boolean'){if(playing)stopLightPreview();setPlaying(playing);}
@@ -349,9 +382,9 @@ async function registerTools(){
       if(!state.lightPreview)startLightPreview(lightPreviewMinutes??0,lightPreviewPlaying??false);
       else{if(lightPreviewMinutes!==undefined){state.lightPreview.minutes=lightPreviewMinutes;setLightPreviewPlaying(false);}if(lightPreviewPlaying!==undefined)setLightPreviewPlaying(lightPreviewPlaying);}
     }
-    if(jumpNotices!==undefined)setJumpNotices(jumpNotices);if(layers!==undefined)setEnvironmentLayers(layers);
+    if(jumpNotices!==undefined)setJumpNotices(jumpNotices);if(layers!==undefined)setEnvironmentLayers(layers);if(stepMinutes!==undefined)stepPlayback(Math.sign(stepMinutes));
     updateUi(true);updateCamera(1);
-    return {jumpNotices:state.jumpNotices,environment:state.environmentLayers,journey:state.journey.id,time:state.time,camera:state.mode,playing:state.playing,clock:state.timeBasis,lighting:state.lighting?'flight':'daylight',lightPreviewMinutes:state.lightPreview?.minutes??null};
+    return {direction:state.direction===-1?'backward':'forward',jumpNotices:state.jumpNotices,environment:state.environmentLayers,journey:state.journey.id,time:state.time,camera:state.mode,playing:state.playing,clock:state.timeBasis,lighting:state.lighting?'flight':'daylight',lightPreviewMinutes:state.lightPreview?.minutes??null};
   }},{signal:lifecycle.signal});
 }
 

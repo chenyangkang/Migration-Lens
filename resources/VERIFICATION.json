@@ -41,7 +41,13 @@
       "jump notice preference survives reload",
       "weather-layer preferences survive reload",
       "390 px weather card and map do not overlap",
-      "nearby wind arrows in first-person view"
+      "nearby wind arrows in first-person view",
+      "ten-minute forward/backward steps return to the same recorded time",
+      "quiet steps cross overnight and short GPS gaps",
+      "accelerated backward playback moves the historical clock backward",
+      "backward gap card jumps to the previous fix",
+      "320/390 px transport controls fit without horizontal overflow",
+      "desktop rewind controls fit in the playback footer"
     ],
     "webmcp": {
       "valid_playback_input": "passed",
@@ -51,19 +57,21 @@
     "startup_loading": "passed",
     "local_asset_delivery": "passed",
     "time_and_light_tests": 6,
-    "total_tests": 23,
+    "total_tests": 28,
     "local_time": "full geographic timezone boundaries and historical DST verified",
     "sunlight": "flight timestamps drive Cesium sun, terrain and atmosphere; fade adjusted at flight height",
     "gaps_and_catalog_tests": 5,
     "publication": {
       "site_http_status": 200,
       "catalog_http_status": 200,
-      "journeys": 5,
+      "journeys": 13,
       "species": 4,
       "crane_repair_present": true,
       "github_pages_source": "GitHub Actions",
-      "last_verified_release": "0826c39691cda68a064051a7a2dd797f39e2bef9",
-      "note": "Publication checks below refer to the prior release. The expanded local catalog and weather are tested above; the workflow publishes them on push."
+      "last_verified_release": "2ec9c45d006faa9773fe2e7598711329270946f4",
+      "note": "Public catalog and weather checks refer to the prior release. The navigation update is tested locally above and published by the workflow on push.",
+      "individuals": 12,
+      "weather_file_hash_verified": true
     },
     "environment_and_individuals_tests": 6,
     "catalog": {
@@ -80,7 +88,8 @@
       "units": "temperature 2m \u00b0C; precipitation preceding hour mm; wind 10m m/s stored as east/north vectors",
       "coverage": "every recorded fix and segment midpoint validated",
       "hosting": "static per-journey JSON, lazy loaded; no browser weather API calls"
-    }
+    },
+    "reverse_playback_tests": 5
   },
   "limitations": [
     "Raw GPS height vertical datum unspecified; camera height approximate.",
