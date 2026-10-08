@@ -1,5 +1,5 @@
 {
-  "status": "local_app_verified_github_deployment_pending",
+  "status": "published_and_verified",
   "checks": {
     "flight_math_tests": 6,
     "syntax": "passed",
@@ -28,7 +28,9 @@
       "pause before jump",
       "explicit jump acknowledgement",
       "crane ground route and illustrative first-person height",
-      "hatched timeline and dashed route gaps"
+      "hatched timeline and dashed route gaps",
+      "public HTTPS startup with five journeys",
+      "390 px phone controls without horizontal overflow"
     ],
     "webmcp": {
       "valid_playback_input": "passed",
@@ -41,7 +43,15 @@
     "total_tests": 17,
     "local_time": "full geographic timezone boundaries and historical DST verified",
     "sunlight": "flight timestamps drive Cesium sun, terrain and atmosphere; fade adjusted at flight height",
-    "gaps_and_catalog_tests": 5
+    "gaps_and_catalog_tests": 5,
+    "publication": {
+      "site_http_status": 200,
+      "catalog_http_status": 200,
+      "journeys": 5,
+      "species": 4,
+      "crane_repair_present": true,
+      "github_pages_source": "GitHub Actions"
+    }
   },
   "limitations": [
     "Raw GPS height vertical datum unspecified; camera height approximate.",
@@ -52,5 +62,7 @@
     "Crane altitude not released; sparse fixes use illustrative viewing height. Goose and crane speeds are estimated segment means."
   ],
   "product_url_local": "http://127.0.0.1:4173/",
-  "publication": "GitHub Pages enabled; production deployment verification pending."
+  "publication": "Published through GitHub Pages; future pushes to main test, build and deploy automatically.",
+  "product_url_public": "https://chenyangkang.github.io/Migration-Lens/",
+  "repository": "https://github.com/chenyangkang/Migration-Lens"
 }
